@@ -37,15 +37,19 @@ def make_preprocessing(config):
     #get data from domain encoded files
         #TRAINING DATA
     df_train = pd.read_csv((base_path / "./data_files/domain_train_data.csv").resolve())
-    #X_train = df_train.drop(['SalePrice','Id'], axis=1).copy()
-    #Y_train = df_train['Id','SalePrice'].copy()
+    X_train = df_train.drop(['SalePrice','Id'], axis=1).copy()
+    Y_train = df_train[['Id','SalePrice']].copy()
+    print(f'The X_train shape is:{X_train.shape}')
+    #Y_train['SalePrice_1log']=np.log1p(Y_train['SalePrice'])
 
         # TEST DATA
     df_test= pd.read_csv((base_path / "./data_files/domain_test_data.csv").resolve())
 
 
-    X_train = df_train.drop(['SalePrice','Id'], axis=1).copy()
-    Y_train = df_train[['Id','SalePrice']].copy()
+    X_test = df_test.drop(['Id'], axis=1).copy()
+    print(f'The X_test shape is:{X_test.shape}')
+    #Y_test = df_test[['SalePrice']].copy()
+
     # print(X_train.head())
     # print(Y_train.head())
 
@@ -71,7 +75,7 @@ def make_preprocessing(config):
                         use_cat_names=False)
 
     # STEP 3 - numerical values quantile transformation with skewness removing
-    q_trans = QuantileTransformerDf(n_quantiles=1000, output_distribution='uniform',
+    q_trans = QuantileTransformerDf(n_quantiles=1000, output_distribution='uniform', #normal or uniform
                                     ignore_implicit_zeros=False,
                                     subsample=1e5, random_state=42, copy=True, dataframe_as_output=True,
                                     dtype=np.float32)
@@ -81,8 +85,8 @@ def make_preprocessing(config):
     ddf = DropDuplicateFeatures()
 
     # STEP 4 - missing values multivariate imputation
-    imp = IterativeImputerDf(min_value=0,  # values from 0 to 1 for categorical for numeric
-                             max_value=1,
+    imp = IterativeImputerDf(min_value=-np.inf,  # values from 0 to 1 for categorical for numeric
+                             max_value=np.inf,
                              random_state=42,
                              initial_strategy='median',
                              max_iter=config['max_iter'],
@@ -107,15 +111,21 @@ def make_preprocessing(config):
         ('drop_quasi_const1', dcf),
         ('drop_duplicate1', ddf),
         ('imputer', imp),
-        ('drop_quasi_const2', dcf),
-        ('drop_duplicate2', ddf),
-        ('smart_correlated_sel', scs),
+       # ('drop_quasi_const2', dcf),
+       # ('drop_duplicate2', ddf),
+       # ('smart_correlated_sel', scs),
     ])
 
     # Pipeline training
 
     X_train_encoded = pipeline.fit_transform(X_train)
-    print('X_train_encoded', type(X_train_encoded))
+    print('X_train_encoded after', X_train_encoded.shape)
+
+    #TEST DATA
+
+    X_test_encoded = pipeline.transform(X_test) #ma być X_test
+    print('X_test_encoded after', X_test_encoded.shape)
+
     # save X_train_encoded array
     # save(file=train_enc_path, arr=X_train_encoded)
     # save(file=y_train_path, arr=Y_train)
@@ -123,7 +133,7 @@ def make_preprocessing(config):
     # save trained pipeline
     # joblib.dump(pipeline, pipeline_path)
     df_train_encoded = pd.concat([X_train_encoded, Y_train], axis=1)
-    print(df_train_encoded.head())
+    #print(df_train_encoded.head())
 
     df_train_encoded.to_csv(
         path_or_buf=x_train_enc_path,
@@ -134,6 +144,21 @@ def make_preprocessing(config):
         x_train_enc_path_xlsx,
         sheet_name='output_data',
         index=False)
+
+
+    X_test_encoded.to_csv(
+        path_or_buf=x_test_enc_path,
+        sep=',',
+        header=True,
+        index=False)
+    X_test_encoded.to_excel(
+        x_test_enc_path_xlsx,
+        sheet_name='output_data',
+        index=False)
+
+
+
+
 
     # STEP 7 SPLITTING DATA FOR KERAS
     X_train, X_test, y_train, y_test = train_test_split(X_train_encoded, Y_train,
@@ -166,8 +191,8 @@ if __name__ == "__main__":
         "rare_tol": 0.05,
         "n_categories": 1,
         # Iterative imputer
-        "max_iter": 30,
-        "iter_tol": 0.001,
+        "max_iter": 2,
+        "iter_tol": 1e-3,
         "output": 'df',
         'base_path': base_path
     }
@@ -179,5 +204,5 @@ if __name__ == "__main__":
     with joblib.parallel_backend('ray'):
         X, y = make_preprocessing(config=config)
 
-        print(X.head())
-        print(f'The input shape is:{X.shape}')
+        #print(X.head())
+        #print(f'The input shape is:{X.shape}')
