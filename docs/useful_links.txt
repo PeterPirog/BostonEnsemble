@@ -1,0 +1,9 @@
+
+Ensemble models:
+
+https://towardsdatascience.com/ensemble-models-5a62d4f4cb0c
+
+
+Kaggle Competition:
+1. Feature engineering and ensembled models for the top 10 in Kaggle “Housing Prices Competition”
+    https://towardsdatascience.com/feature-engineering-and-ensembled-models-for-the-top-10-in-kaggle-housing-prices-competition-efb35828eef0
