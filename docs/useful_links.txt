@@ -3,6 +3,9 @@ Ensemble models:
 
 https://towardsdatascience.com/ensemble-models-5a62d4f4cb0c
 
+Quantile data transformation
+1. https://www.researchgate.net/post/Should_outliers_be_removed_before_or_after_data_transformation
+
 
 Kaggle Competition:
 1. Feature engineering and ensembled models for the top 10 in Kaggle “Housing Prices Competition”
