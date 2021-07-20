@@ -14,6 +14,7 @@ class DomainKnowledgeTransformer(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         X_ = X.copy()
+        df=X
         ### "Id" - feature (it's only index -remove)
         #X_ = X_.drop(['Id'], axis=1)
 
@@ -562,6 +563,7 @@ class DomainKnowledgeTransformer(BaseEstimator, TransformerMixin):
 
 if __name__ == '__main__':
     verbose = False
+    import os
 
     # Using modin
     """
@@ -576,7 +578,8 @@ if __name__ == '__main__':
     # make all dataframe columns visible
     pd.set_option('display.max_columns', None)
 
-    df = pd.read_csv('/home/peterpirog/PycharmProjects/BostonHousesTune/preprocessing/train.csv')
+    df_train = pd.read_csv('/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/train.csv')
+    df_test = pd.read_csv('/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/test.csv')
     # df.to_excel('/home/peterpirog/PycharmProjects/BostonHousesTune/preprocessing/train.xlsx',
     #            sheet_name='X_train_data',
     #            index=False)
@@ -587,15 +590,24 @@ if __name__ == '__main__':
     from ray.util.joblib import register_ray
 
 
-    df_out = dkt.fit_transform(X=df)
-    df_out.to_csv(path_or_buf='/home/peterpirog/PycharmProjects/BostonHousesTune/preprocessing/preprocessed_train_data.csv',
+    df_out_train = dkt.fit_transform(X=df_train)
+    df_out_test=dkt.transform(X=df_test)
+
+    df_out_train.to_csv(path_or_buf='/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/domain_train_data.csv',
                   sep=',',
                   header=True,
                   index=False)
-    df_out.to_excel('/home/peterpirog/PycharmProjects/BostonHousesTune/preprocessing/preprocessed_train_data.xlsx',
+    df_out_train.to_excel('/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/domain_train_data.xlsx',
+                    sheet_name='output_data',
+                    index=False)
+    df_out_test.to_csv(path_or_buf='/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/domain_test_data.csv',
+                  sep=',',
+                  header=True,
+                  index=False)
+    df_out_test.to_excel('/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/domain_test_data.xlsx',
                     sheet_name='output_data',
                     index=False)
 
-    print(df_out.head(10))
-    print(df_out.info())
-    print(df_out.describe())
+    #print(df_out_train.head(10))
+    #print(df_out_train.info())
+    #print(df_out_train.describe())
