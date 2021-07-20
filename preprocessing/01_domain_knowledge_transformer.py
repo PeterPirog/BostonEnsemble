@@ -1,6 +1,6 @@
-import ray#
 import numpy as np
-import pandas as pd  # modin.pandas as pd
+import pandas as pd
+from pathlib import Path
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
@@ -14,12 +14,12 @@ class DomainKnowledgeTransformer(BaseEstimator, TransformerMixin):
 
     def transform(self, X, y=None):
         X_ = X.copy()
-        df=X
+        df = X
         ### "Id" - feature (it's only index -remove)
-        #X_ = X_.drop(['Id'], axis=1)
+        # X_ = X_.drop(['Id'], axis=1)
 
         ### "MSSubClass" - feature (it's only index -remove)
-        X_['_MSSubClass'] = X_.MSSubClass.map(str)+'_'  #convert to string from integer
+        X_['_MSSubClass'] = X_.MSSubClass.map(str) + '_'  # convert to string from integer
         ####df['_MSSubClass'] = df['MSSubClass'].apply(lambda x: 'True' if x <= 53 else 'False')
         if self.remove_original:
             X_ = X_.drop(['MSSubClass'], axis=1)
@@ -525,7 +525,7 @@ class DomainKnowledgeTransformer(BaseEstimator, TransformerMixin):
 
         ### "MoSold" - default value np.nan
         X_['_MoSold'] = np.where(df['MoSold'].isnull(), np.nan, df['MoSold'].values)
-        X_['_QuarterSold']=1+(X_['_MoSold']-1)//3
+        X_['_QuarterSold'] = 1 + (X_['_MoSold'] - 1) // 3
         if self.remove_original:
             X_ = X_.drop(['MoSold'], axis=1)
 
@@ -533,7 +533,6 @@ class DomainKnowledgeTransformer(BaseEstimator, TransformerMixin):
         X_['_YrSold'] = np.where(df['YrSold'].isnull(), np.nan, df['YrSold'].values)
         if self.remove_original:
             X_ = X_.drop(['YrSold'], axis=1)
-
 
         ### "SaleType" - default value np.nan
         X_['_SaleType_WD'] = np.where(df['SaleType'] == 'WD', 1, 0)
@@ -563,51 +562,36 @@ class DomainKnowledgeTransformer(BaseEstimator, TransformerMixin):
 
 if __name__ == '__main__':
     verbose = False
-    import os
 
-    # Using modin
-    """
-    try:
-        ray.init()
-        #ray.init(address='auto', _redis_password='5241590000000000')
-    except:
-        ray.shutdown()
-        ray.init()
-    """
+    # define path to the project directory
+    base_path = Path(__file__).parent.parent
 
     # make all dataframe columns visible
     pd.set_option('display.max_columns', None)
 
-    df_train = pd.read_csv('/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/train.csv')
-    df_test = pd.read_csv('/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/test.csv')
-    # df.to_excel('/home/peterpirog/PycharmProjects/BostonHousesTune/preprocessing/train.xlsx',
-    #            sheet_name='X_train_data',
-    #            index=False)
-    # print(df.head())
+    df_train = pd.read_csv((base_path / "./data_files/train.csv").resolve())
+    df_test = pd.read_csv((base_path / "./data_files/test.csv").resolve())
 
     dkt = DomainKnowledgeTransformer()
-    import joblib
-    from ray.util.joblib import register_ray
-
 
     df_out_train = dkt.fit_transform(X=df_train)
-    df_out_test=dkt.transform(X=df_test)
+    df_out_test = dkt.transform(X=df_test)
 
-    df_out_train.to_csv(path_or_buf='/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/domain_train_data.csv',
-                  sep=',',
-                  header=True,
-                  index=False)
-    df_out_train.to_excel('/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/domain_train_data.xlsx',
-                    sheet_name='output_data',
-                    index=False)
-    df_out_test.to_csv(path_or_buf='/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/domain_test_data.csv',
-                  sep=',',
-                  header=True,
-                  index=False)
-    df_out_test.to_excel('/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/domain_test_data.xlsx',
-                    sheet_name='output_data',
-                    index=False)
+    df_out_train.to_csv(path_or_buf=(base_path / "./data_files/domain_train_data.csv").resolve(),
+                        sep=',',
+                        header=True,
+                        index=False)
+    df_out_train.to_excel((base_path / "./data_files/domain_train_data.xlsx").resolve(),
+                          sheet_name='output_data',
+                          index=False)
+    df_out_test.to_csv(path_or_buf=(base_path / "./data_files/domain_test_data.csv").resolve(),
+                       sep=',',
+                       header=True,
+                       index=False)
+    df_out_test.to_excel((base_path / "./data_files/domain_test_data.xlsx").resolve(),
+                         sheet_name='output_data',
+                         index=False)
 
-    #print(df_out_train.head(10))
-    #print(df_out_train.info())
-    #print(df_out_train.describe())
+    print(df_out_train.head(10))
+    # print(df_out_train.info())
+    # print(df_out_train.describe())
