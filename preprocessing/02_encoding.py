@@ -119,7 +119,9 @@ def make_preprocessing(config):
 
     # save trained pipeline
     joblib.dump(pipeline, (base_path / "./data_files/pipeline.jbl").resolve())
+    Y_train['SalePrice_log1']=np.log1p(Y_train['SalePrice'])
     df_train_encoded = pd.concat([X_train_encoded, Y_train], axis=1)
+
     # print(df_train_encoded.head())
 
     df_train_encoded.to_csv(
