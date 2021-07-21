@@ -3,44 +3,41 @@
 import pandas as pd
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.preprocessing import QuantileTransformer as _QuantileTransformer
+from sklearn.preprocessing import QuantileTransformer
 from feature_engine.encoding import RareLabelEncoder
 
 from sklearn.experimental import enable_iterative_imputer  # noqa
 # now you can import normally from sklearn.impute
-from sklearn.impute import IterativeImputer as _IterativeImputer
+from sklearn.impute import IterativeImputer
 
 from category_encoders import one_hot
 
-#https://github.com/scikit-learn/scikit-learn/issues/5523
-def check_output(X, ensure_index=None, ensure_columns=None):
+
+
+class QuantileTransformerDf(QuantileTransformer):
+    """DataFrame Wrapper around QuantileTransformer
+    Function based on: https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.QuantileTransformer.html
     """
-    Joins X with ensure_index's index or ensure_columns's columns when avaialble
-    """
-    if ensure_index is not None:
-        if ensure_columns is not None:
-            if type(ensure_index) is pd.DataFrame and type(ensure_columns) is pd.DataFrame:
-                X = pd.DataFrame(X, index=ensure_index.index, columns=ensure_columns.columns)
+
+    def __init__(self, n_quantiles=1000, output_distribution='uniform', ignore_implicit_zeros=False,
+                 subsample=1e5, random_state=42, copy=True, dataframe_as_output=True,dtype='float32'):
+        super(QuantileTransformerDf, self).__init__(n_quantiles=n_quantiles,
+                                                    output_distribution=output_distribution,
+                                                    ignore_implicit_zeros=ignore_implicit_zeros,
+                                                    subsample=subsample,
+                                                    random_state=random_state,
+                                                    copy=copy)
+        self.dataframe_as_output = dataframe_as_output
+        self.dtype=dtype
+
+    def transform(self, X, y=None):
+        X = X.copy()
+        z = super(QuantileTransformerDf, self).transform(X.values)
+        if self.dataframe_as_output:
+            return pd.DataFrame(z, index=X.index, columns=X.columns,dtype=self.dtype)
         else:
-            if type(ensure_index) is pd.DataFrame:
-                X = pd.DataFrame(X, index=ensure_index.index)
-    return X
+            return z
 
-class IterativeImputer(_IterativeImputer):
-    def transform(self, X):
-        Xt = super(IterativeImputer, self).transform(X)
-        return check_output(Xt, ensure_index=X, ensure_columns=X)
-    def fit_transform(self, X,y):
-        Xt = super(IterativeImputer, self).fit_transform(X)
-        return check_output(Xt, ensure_index=X, ensure_columns=X)
-
-class QuantileTransformer(_QuantileTransformer):
-    def transform(self, X):
-        Xt = super(QuantileTransformer, self).transform(X)
-        return check_output(Xt, ensure_index=X, ensure_columns=X)
-    def fit_transform(self, X,y):
-        Xt = super(QuantileTransformer, self).fit_transform(X)
-        return check_output(Xt, ensure_index=X, ensure_columns=X)
 
 class RareLabelNanEncoder(BaseEstimator, TransformerMixin):
     """This function based on:
@@ -163,4 +160,47 @@ class OneHotNanEncoder(BaseEstimator, TransformerMixin):
         # X[self.new_categories] = X[self.new_categories].astype(self.dtype)
         """
         return X
+
+
+class IterativeImputerDf(IterativeImputer):
+    """DataFrame Wrapper around QuantileTransformer
+    Function based on: https://scikit-learn.org/stable/modules/generated/sklearn.preprocessing.QuantileTransformer.html
+    """
+
+    def __init__(self, min_value=-np.inf,  # values from 0 to 1 for categorical for numeric
+                 max_value=np.inf,
+                 random_state=42,
+                 max_iter=10,
+                 tol=1e-3,
+                 initial_strategy='median',
+                 verbose=1, dataframe_as_output=True):
+        super(IterativeImputerDf, self).__init__(min_value=min_value,
+                                                 max_value=max_value,
+                                                 random_state=random_state,
+                                                 max_iter=max_iter,
+                                                 tol=tol,
+                                                 initial_strategy=initial_strategy,
+                                                 verbose=verbose)
+        self.dataframe_as_output = dataframe_as_output
+        print('dataframe_as_output=', self.dataframe_as_output)
+
+    def transform(self, X, y=None):
+        X = X.copy()
+        z = super(IterativeImputerDf, self).transform(X.values)
+
+        if self.dataframe_as_output:
+            return pd.DataFrame(z, index=self.index, columns=self.columns)
+        else:
+            return z
+
+    def fit_transform(self, X, y=None):
+        X = X.copy()
+        z = super(IterativeImputerDf, self).fit_transform(X.values)
+        self.index = X.index
+        self.columns = X.columns
+
+        if self.dataframe_as_output:
+            return pd.DataFrame(z, index=self.index, columns=self.columns)
+        else:
+            return z
 
