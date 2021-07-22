@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from sklearn.model_selection import RepeatedKFold, cross_val_score
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Ridge
 
 if __name__ == "__main__":
     base_path = Path(__file__).parent.parent
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     for i in range(n_features):
 
         X = df[features_all[:i+1]]
-        model = LinearRegression()
+        model = Ridge(alpha=5.0)
     
         # define model evaluation method
         cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=1)
@@ -46,12 +46,13 @@ if __name__ == "__main__":
             min_error=M
             idx_min=i+1
 
-    print(results)
+    #print(results)
     print(f'Minimum error is: {min_error} for {idx_min} features')
+    np.save("linear_errors.npy",results)
     np.save("linear_errors.npy",results)
     df = pd.DataFrame(data=results, columns=["Features", "Mean","STD","Mean_2STD"])
     df.to_excel(
-        'model_linear_features.xlsx',
+        'model_ridge_features.xlsx',
         sheet_name='Linear',
         index=False)
 
