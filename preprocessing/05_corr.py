@@ -1,4 +1,4 @@
-import modin.pandas as pd
+import pandas as pd
 import numpy as np
 from pathlib import Path
 from sklearn.decomposition import PCA
@@ -8,16 +8,35 @@ import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
 
+
+
     # define path to the project directory
     base_path = Path(__file__).parent.parent
 
     df_train = pd.read_csv((base_path / "./data_files/encoded_train_X_data.csv").resolve())
     df_train= df_train.drop(['SalePrice','Id'], axis=1)
     plt.matshow(df_train.corr())
-    plt.show()
+    #plt.show()
 
     c=df_train[df_train.columns[1:]].corr()['SalePrice_log1'][:]
-    print(c)
+    c.to_excel("output_corr.xlsx")
+
+    df=c.to_frame().reset_index()
+    print('Type=',type(df))
+    print('columns=', df.columns)
+
+    df['Feature']=df['index']
+    df['Corr'] = df['SalePrice_log1']
+    df['Abs_Corr']=abs(df['Corr'])
+    df=df.drop(['index','SalePrice_log1'],axis=1)
+    df=df.sort_values(by=['Abs_Corr'],ascending=False)
+
+    arr = df["Feature"].to_list()
+    del arr[0]
+
+    #df.rename({1: 2, 2: 4}, axis='index')
+    print('List len=',len(arr))
+    print(arr)
     """
     columns=df_train.columns
     print('Columns:',columns)
