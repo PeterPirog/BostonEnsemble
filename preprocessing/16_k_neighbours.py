@@ -33,7 +33,9 @@ if __name__ == "__main__":
     for i in range(n_features):
 
         X = df[features_all[:i + 1]]
-        model = KNeighborsRegressor(n_neighbors=20, weights='distance')  # {‘uniform’, ‘distance’}
+        model = KNeighborsRegressor(n_neighbors=9,
+                                    weights='distance',# {‘uniform’, ‘distance’}
+                                    p=1)
 
         # define model evaluation method
         cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=1)
