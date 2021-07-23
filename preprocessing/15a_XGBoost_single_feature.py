@@ -72,6 +72,6 @@ if __name__ == "__main__":
     df2 = pd.DataFrame({'Feature': features_all})
     df = pd.concat([df , df2], axis=1)
     df.to_excel(
-        'model_xgoost_single_features.xlsx',
+        'model_xgboost_single_features.xlsx',
         sheet_name='Feature_analysis',
         index=False)
