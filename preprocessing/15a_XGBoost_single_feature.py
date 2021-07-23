@@ -24,17 +24,17 @@ if __name__ == "__main__":
                     '_Neighborhood_2', '_YrSold', '_BsmtFinSF2', '_BldgType_3', '_Exterior_Plywood', '_LandContour_2',
                     '_MSZoning_3', '_LotConfig_3']
     n_features = len(features_all)
-    # n_features=3
+    n_features=2
     y = df['SalePrice_log1']
 
-    results = np.zeros((n_features, 5))
+    results = np.zeros((n_features, 4))
     min_error = np.inf
     idx_min = None
     for i in range(n_features):
 
         X = df[features_all[i]].to_frame()  # <<<-------------------- make model from single feature
 
-        model = XGBRegressor(n_estimators=30,
+        model = XGBRegressor(n_estimators=50,
                              max_depth=4,
                              eta=0.1,
                              subsample=1,
@@ -60,7 +60,6 @@ if __name__ == "__main__":
         results[i, 1] = M
         results[i, 2] = STD
         results[i, 3] = M + 2 * STD
-        results[i, 4] = str(features_all[i])
         if M < min_error:
             min_error = M
             idx_min = i + 1
@@ -69,8 +68,10 @@ if __name__ == "__main__":
     print(f'Minimum error is: {min_error} for {idx_min} features')
     np.save("linear_errors.npy", results)
     np.save("linear_errors.npy", results)
-    df = pd.DataFrame(data=results, columns=["Features", "Mean", "STD", "Mean_2STD","Feature_name"])
+    df = pd.DataFrame(data=results, columns=["Features", "Mean", "STD", "Mean_2STD"])
+    df2 = pd.DataFrame({'Feature': features_all})
+    df = pd.concat([df , df2], axis=1)
     df.to_excel(
         'model_xgoost_single_features.xlsx',
-        sheet_name='Linear',
+        sheet_name='Feature_analysis',
         index=False)
