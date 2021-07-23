@@ -19,8 +19,9 @@ if __name__ == "__main__":
     for i in range(n_features):
 
         X = df[features_all[:i+1]]
-        model = ElasticNet(alpha=0.1, l1_ratio=0.05)
-    
+        model = ElasticNet(alpha=0.0007431419163482603, l1_ratio=0.97)
+        #model = ElasticNet(alpha=0.000730365663255135, l1_ratio=1.0)
+
         # define model evaluation method
         cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=1)
         # evaluate_model

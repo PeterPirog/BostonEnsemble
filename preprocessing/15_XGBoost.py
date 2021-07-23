@@ -19,8 +19,8 @@ if __name__ == "__main__":
     for i in range(n_features):
 
         X = df[features_all[:i+1]]
-        model = XGBRegressor(n_estimators=50,
-                             max_depth=4,
+        model = XGBRegressor(n_estimators=144,
+                             max_depth=6,
                              eta=0.1,
                              subsample=1,
                              colsample_bytree=1)
@@ -56,7 +56,7 @@ if __name__ == "__main__":
     np.save("linear_errors.npy",results)
     df = pd.DataFrame(data=results, columns=["Features", "Mean","STD","Mean_2STD"])
     df.to_excel(
-        'model_xgoost_features.xlsx',
+        'model_xgboost_features.xlsx',
         sheet_name='Linear',
         index=False)
 

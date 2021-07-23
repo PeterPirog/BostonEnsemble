@@ -19,9 +19,9 @@ if __name__ == "__main__":
     for i in range(n_features):
 
         X = df[features_all[:i+1]]
-        model = RandomForestRegressor(n_estimators=100,
+        model = RandomForestRegressor(n_estimators=122,
                                       criterion='mse',
-                                      max_depth=10,
+                                      max_depth=12,
                                       min_samples_split=2,
                                       min_samples_leaf=1,
                                       min_weight_fraction_leaf=0.0,

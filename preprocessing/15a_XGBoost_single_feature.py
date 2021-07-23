@@ -24,7 +24,7 @@ if __name__ == "__main__":
                     '_Neighborhood_2', '_YrSold', '_BsmtFinSF2', '_BldgType_3', '_Exterior_Plywood', '_LandContour_2',
                     '_MSZoning_3', '_LotConfig_3']
     n_features = len(features_all)
-    n_features=2
+    #n_features=2
     y = df['SalePrice_log1']
 
     results = np.zeros((n_features, 4))
