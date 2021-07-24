@@ -1,4 +1,3 @@
-
 import ray
 from ray import tune
 from ray.tune.schedulers import ASHAScheduler
@@ -9,8 +8,6 @@ import pandas as pd
 from pathlib import Path
 from sklearn.model_selection import RepeatedKFold, cross_val_score
 from sklearn.linear_model import ElasticNet
-
-
 
 
 def train_boston(config):
@@ -36,15 +33,11 @@ def train_boston(config):
     # n_features=3
     y = df['SalePrice_log1']
 
-
-
     X = df[features_all[:config['n_features']]]
     model = ElasticNet(alpha=config['alpha'], l1_ratio=config['l1_ratio'])
 
-
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
     # evaluate_model
-
 
     scores = cross_val_score(model, X, y,
                              scoring='neg_root_mean_squared_error',  # 'neg_mean_absolute_error' make_scorer(rmsle)
@@ -54,15 +47,13 @@ def train_boston(config):
     # force scores to be positive
     scores = abs(scores)
 
-    #print('Mean RMSLE: %.4f (%.4f)' % (scores.mean(), scores.std()))
+    # print('Mean RMSLE: %.4f (%.4f)' % (scores.mean(), scores.std()))
 
     # Creating own metric
-    ray.tune.report(_metric=scores.mean()+2*scores.std())
+    ray.tune.report(_metric=scores.mean() + 2 * scores.std())
 
 
 if __name__ == "__main__":
-
-
 
     try:
         ray.init()
@@ -82,7 +73,7 @@ if __name__ == "__main__":
         train_boston,
         search_alg=HyperOptSearch(),
         name="elastic",
-        #scheduler=sched_asha, - no need scheduler if there is no iterations
+        # scheduler=sched_asha, - no need scheduler if there is no iterations
         # Checkpoint settings
         keep_checkpoints_num=3,
         checkpoint_freq=3,
@@ -98,19 +89,20 @@ if __name__ == "__main__":
         num_samples=5000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
-        local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',# default value is ~/ray_results /root/ray_results/  or ~/ray_results
+        local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
+        # default value is ~/ray_results /root/ray_results/  or ~/ray_results
         resources_per_trial={
             "cpu": 16  # ,
             # "gpu": 0
         },
         config={
-            "alpha":  tune.loguniform(1e-5, 100),
-            "l1_ratio":tune.quniform(0, 1, 0.01),
-            "n_features":tune.randint(1, 79)
+            "alpha": tune.loguniform(1e-5, 100),
+            "l1_ratio": tune.quniform(0, 1, 0.01),
+            "n_features": tune.randint(1, 79)
         }
 
     )
     print("Best hyperparameters found were: ", analysis.best_config)
     # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/elastic --bind_all --load_fast=false
 
-    #https://towardsdatascience.com/beyond-grid-search-hypercharge-hyperparameter-tuning-for-xgboost-7c78f7a2929d
+    # https://towardsdatascience.com/beyond-grid-search-hypercharge-hyperparameter-tuning-for-xgboost-7c78f7a2929d

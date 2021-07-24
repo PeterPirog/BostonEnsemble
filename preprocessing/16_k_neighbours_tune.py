@@ -75,7 +75,8 @@ if __name__ == "__main__":
     analysis = tune.run(
         train_boston,
         search_alg=HyperOptSearch(),
-        name="neighbour",
+        #name="neighbour",
+        name="xgboost",
         # scheduler=sched_asha, - no need scheduler if there is no iterations
         # Checkpoint settings
         keep_checkpoints_num=3,
@@ -89,17 +90,18 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 100
         },
-        num_samples=3000,  # number of samples from hyperparameter space
+        num_samples=30,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
-        local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
+        #local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
+        local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/xgboost/ray_results',
         # default value is ~/ray_results /root/ray_results/  or ~/ray_results
         resources_per_trial={
             "cpu": 16  # ,
             # "gpu": 0
         },
         config={
-            "n_neighbors": tune.randint(3, 50),
+            "n_neighbors": tune.randint(3, 100),
             "weights": tune.choice(["uniform", "distance"]),
             "p": tune.randint(1, 3),
             "n_features": tune.randint(1, 79)
@@ -108,5 +110,7 @@ if __name__ == "__main__":
     )
     print("Best hyperparameters found were: ", analysis.best_config)
     # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/neighbour --bind_all --load_fast=false
+    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/xgboost/ray_results/xgboost --bind_all
 
     # https://towardsdatascience.com/beyond-grid-search-hypercharge-hyperparameter-tuning-for-xgboost-7c78f7a2929d
+    #tensorboard --inspect --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/xgboost/ray_results/xgboost
