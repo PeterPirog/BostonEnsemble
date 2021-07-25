@@ -19,7 +19,20 @@ if __name__ == "__main__":
     for i in range(n_features):
 
         X = df[features_all[:i+1]]
-        model = BayesianRidge(n_iter=500, tol=0.001, alpha_1=1e-06, alpha_2=1e-06, lambda_1=1e-06, lambda_2=1e-06)
+        model = BayesianRidge(n_iter=1000, tol=0.001,
+                              alpha_1=3.1172486114073886e-05,
+                              alpha_2=0.0005102363543687061,
+                              lambda_1=989.0796460727609,
+                              lambda_2=4.2258412682786455)
+        #{'alpha_1': 1.6064159647995144, 'alpha_2': 0.0006938666171130032, 'lambda_1': 9.992527652467636,
+        # 'lambda_2': 0.005455410819768545, 'n_iter': 2200, 'n_features': 65}
+
+        #{'alpha_1': 9.72388775106826e-08, 'alpha_2': 0.045411999724395025, 'lambda_1': 528.3053702920404,
+        # 'lambda_2': 2.4551050098681624, 'n_iter': 1200, 'n_features': 65} =0.13565745820324537
+
+        #{'alpha_1': 3.1172486114073886e-05, 'alpha_2': 0.0005102363543687061, 'lambda_1': 989.0796460727609,
+        # 'lambda_2': 4.2258412682786455, 'n_iter': 1000, 'n_features': 65} 0.13564517546213767
+
     
         # define model evaluation method
         cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=1)
