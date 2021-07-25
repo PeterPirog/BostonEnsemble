@@ -7,7 +7,7 @@ import pandas as pd
 
 from pathlib import Path
 from sklearn.model_selection import RepeatedKFold, cross_val_score
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import BayesianRidge
 
 
 def train_boston(config):
@@ -34,18 +34,16 @@ def train_boston(config):
     y = df['SalePrice_log1']
 
     X = df[features_all[:config['n_features']]]
-    # model
-    model = RandomForestRegressor(config['n_estimators'],
-                                  criterion='mse',
-                                  max_depth=config['max_depth'],
-                                  min_samples_split=2,
-                                  min_samples_leaf=1,
-                                  min_weight_fraction_leaf=0.0,
-                                  max_features='auto')
+
+    model = BayesianRidge(n_iter=config['n_iter'], tol=0.001,
+                          alpha_1=config['alpha_1'],
+                          alpha_2=config['alpha_2'],
+                          lambda_1=config['lambda_1'],
+                          lambda_2=config['lambda_2'])
 
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-
     # evaluate_model
+
     scores = cross_val_score(model, X, y,
                              scoring='neg_root_mean_squared_error',  # 'neg_mean_absolute_error' make_scorer(rmsle)
                              cv=cv,
@@ -79,7 +77,7 @@ if __name__ == "__main__":
     analysis = tune.run(
         train_boston,
         search_alg=HyperOptSearch(),
-        name="forest",
+        name="bayesian_ridge",
         # scheduler=sched_asha, - no need scheduler if there is no iterations
         # Checkpoint settings
         keep_checkpoints_num=3,
@@ -93,7 +91,7 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 100
         },
-        num_samples=1000,  # number of samples from hyperparameter space
+        num_samples=3000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
         local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
@@ -103,13 +101,16 @@ if __name__ == "__main__":
             # "gpu": 0
         },
         config={
-            "n_estimators": tune.randint(5, 250),
-            "max_depth": tune.randint(2, 15),
+            "alpha_1": tune.loguniform(1e-8, 10),
+            "alpha_2": tune.loguniform(1e-8, 10),
+            "lambda_1": tune.loguniform(1e-8, 10),
+            "lambda_2": tune.loguniform(1e-8, 10),
+            "n_iter": tune.qrandint(200, 5000, 200),
             "n_features": tune.randint(1, 79)
         }
 
     )
     print("Best hyperparameters found were: ", analysis.best_config)
-    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/forest --bind_all --load_fast=false
+    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/bayesian_ridge --bind_all --load_fast=false
 
-    # https://towardsdatascience.com/beyond-grid-search-hypercharge-hyperparameter-tuning-for-xgboost-7c78f7a2929d
+

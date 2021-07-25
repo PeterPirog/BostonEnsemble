@@ -19,13 +19,14 @@ if __name__ == "__main__":
     for i in range(n_features):
 
         X = df[features_all[:i+1]]
-        model = RandomForestRegressor(n_estimators=122,
+        model = RandomForestRegressor(n_estimators=121, #122
                                       criterion='mse',
-                                      max_depth=12,
+                                      max_depth=15, #12
                                       min_samples_split=2,
                                       min_samples_leaf=1,
                                       min_weight_fraction_leaf=0.0,
                                       max_features='auto')
+        #{'n_estimators': 121, 'max_depth': 15, 'n_features': 69}
     
         # define model evaluation method
         cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=1)

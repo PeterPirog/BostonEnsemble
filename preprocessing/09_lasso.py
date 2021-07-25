@@ -19,7 +19,8 @@ if __name__ == "__main__":
     for i in range(n_features):
 
         X = df[features_all[:i+1]]
-        model = Lasso(alpha=0.005)
+        model = Lasso(alpha=0.0007170579876083573,max_iter=2000)
+        #{'alpha': 0.0007170579876083573, 'max_iter': 2000, 'n_features': 74}
     
         # define model evaluation method
         cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=1)

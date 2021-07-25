@@ -86,7 +86,7 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 100
         },
-        num_samples=5000,  # number of samples from hyperparameter space
+        num_samples=3000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
         local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',

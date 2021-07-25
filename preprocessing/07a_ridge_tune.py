@@ -7,7 +7,7 @@ import pandas as pd
 
 from pathlib import Path
 from sklearn.model_selection import RepeatedKFold, cross_val_score
-from sklearn.ensemble import RandomForestRegressor
+from sklearn.linear_model import Ridge
 
 
 def train_boston(config):
@@ -34,18 +34,11 @@ def train_boston(config):
     y = df['SalePrice_log1']
 
     X = df[features_all[:config['n_features']]]
-    # model
-    model = RandomForestRegressor(config['n_estimators'],
-                                  criterion='mse',
-                                  max_depth=config['max_depth'],
-                                  min_samples_split=2,
-                                  min_samples_leaf=1,
-                                  min_weight_fraction_leaf=0.0,
-                                  max_features='auto')
+    model = Ridge(config['alpha'],max_iter=config['max_iter'])
 
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-
     # evaluate_model
+
     scores = cross_val_score(model, X, y,
                              scoring='neg_root_mean_squared_error',  # 'neg_mean_absolute_error' make_scorer(rmsle)
                              cv=cv,
@@ -79,7 +72,7 @@ if __name__ == "__main__":
     analysis = tune.run(
         train_boston,
         search_alg=HyperOptSearch(),
-        name="forest",
+        name="ridge",
         # scheduler=sched_asha, - no need scheduler if there is no iterations
         # Checkpoint settings
         keep_checkpoints_num=3,
@@ -93,7 +86,7 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 100
         },
-        num_samples=1000,  # number of samples from hyperparameter space
+        num_samples=3000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
         local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
@@ -103,13 +96,13 @@ if __name__ == "__main__":
             # "gpu": 0
         },
         config={
-            "n_estimators": tune.randint(5, 250),
-            "max_depth": tune.randint(2, 15),
+            "alpha": tune.loguniform(1e-5, 100),
+            "max_iter": tune.qrandint(500, 10000, 500),
             "n_features": tune.randint(1, 79)
         }
 
     )
     print("Best hyperparameters found were: ", analysis.best_config)
-    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/forest --bind_all --load_fast=false
+    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/ridge --bind_all --load_fast=false
 
-    # https://towardsdatascience.com/beyond-grid-search-hypercharge-hyperparameter-tuning-for-xgboost-7c78f7a2929d
+
