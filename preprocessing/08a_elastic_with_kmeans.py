@@ -32,7 +32,7 @@ if __name__ == "__main__":
 
         #X = df[features_all[:i+1]]
         X = pipe.fit_transform(df[features_all])
-        model = ElasticNet(alpha=0.0001621985745106104, l1_ratio=0.66)
+        model = ElasticNet(alpha=0.0001621985745106104, l1_ratio=0.66,max_iter=3000)
     
         # define model evaluation method
         cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=1)

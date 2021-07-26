@@ -8,7 +8,9 @@ import pandas as pd
 from pathlib import Path
 from sklearn.model_selection import RepeatedKFold, cross_val_score
 from lightgbm import LGBMRegressor
-
+from sklearn.cluster import KMeans
+from sklearn.preprocessing import StandardScaler
+from sklearn.pipeline import Pipeline
 
 def train_boston(config):
     base_path = Path(__file__).parent.parent
@@ -35,16 +37,26 @@ def train_boston(config):
 
     X = df[features_all[:config['n_features']]]
 
+    kmean = KMeans(n_clusters=config['n_clusters'], n_init=config['n_init'], max_iter=500,
+                   tol=0.0001, verbose=0, random_state=1, algorithm='auto')
+    ssc = StandardScaler()
     model = LGBMRegressor(boosting_type=config['boosting_type'],  # 'gbdt' 'dart'
                           num_leaves=config['num_leaves'],
                           max_depth=- 1,
                           learning_rate=config['learning_rate'],
                           n_estimators=config['n_estimators'])
 
+    pipe = Pipeline([
+        ('kmean', kmean),
+        ('ssc', ssc),
+        ('lgbm',model)
+    ])
+
+
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
     # evaluate_model
 
-    scores = cross_val_score(model, X, y,
+    scores = cross_val_score(pipe, X, y,
                              scoring='neg_root_mean_squared_error',  # 'neg_mean_absolute_error' make_scorer(rmsle)
                              cv=cv,
                              n_jobs=-1)
@@ -77,7 +89,7 @@ if __name__ == "__main__":
     analysis = tune.run(
         train_boston,
         search_alg=HyperOptSearch(),
-        name="LGBM",
+        name="LGBM_kmeans",
         # scheduler=sched_asha, - no need scheduler if there is no iterations
         # Checkpoint settings
         keep_checkpoints_num=3,
@@ -91,7 +103,7 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 100
         },
-        num_samples=5000,  # number of samples from hyperparameter space
+        num_samples=3000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
         local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
@@ -101,14 +113,16 @@ if __name__ == "__main__":
             # "gpu": 0
         },
         config={
+            "n_clusters": tune.randint(20, 200),
+            "n_init": tune.randint(3, 30),
             "learning_rate": tune.loguniform(1e-5, 1),
             "num_leaves": tune.randint(30, 50),
-            "n_estimators": tune.randint(50, 150),
+            "n_estimators": tune.randint(50, 200),
             "n_features":tune.randint(60, 79),
-            "boosting_type":tune.choice(['dart']) #, 'dart' 'gbdt'
+            "boosting_type":tune.choice(['gbdt']) #, 'dart' 'gbdt'
         }
 
     )
     print("Best hyperparameters found were: ", analysis.best_config," metric: ", analysis.best_result['_metric'])
-    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/LGBM --bind_all --load_fast=false
+    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/LGBM_kmeans --bind_all --load_fast=false
     #Best hyperparameters found were:  {'learning_rate': 0.11066629069748643, 'num_leaves': 31, 'n_estimators': 142, 'n_features': 78, 'boosting_type': 'gbdt'}  metric:  0.16188236882033707
