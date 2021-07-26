@@ -1,4 +1,3 @@
-
 import ray
 from ray import tune
 from ray.tune.schedulers import ASHAScheduler
@@ -8,10 +7,7 @@ import pandas as pd
 
 from pathlib import Path
 from sklearn.model_selection import RepeatedKFold, cross_val_score
-from sklearn.linear_model import ElasticNet
-from sklearn.pipeline import Pipeline
-from sklearn.manifold import Isomap
-from sklearn.preprocessing import StandardScaler
+from lightgbm import LGBMRegressor
 
 
 def train_boston(config):
@@ -33,23 +29,21 @@ def train_boston(config):
                     '_HouseStyle_2', '_Exterior_HdBoard', '_MSSubClass_2', '_QuarterSold', '_ExterCond',
                     '_Neighborhood_2', '_YrSold', '_BsmtFinSF2', '_BldgType_3', '_Exterior_Plywood', '_LandContour_2',
                     '_MSZoning_3', '_LotConfig_3']
-
-
-    iso=Isomap(n_neighbors=config['n_neighbors'], n_components=config['n_components'])
-
-    ssc = StandardScaler()
-    pipe = Pipeline([
-        ('iso', iso),
-        ('ssc', ssc),
-    ])
-
-    X = pipe.fit_transform(df[features_all])
+    n_features = len(features_all)
+    # n_features=3
     y = df['SalePrice_log1']
 
-    model = ElasticNet(alpha=config['alpha'], l1_ratio=config['l1_ratio'])
+    X = df[features_all[:config['n_features']]]
+
+    model = LGBMRegressor(boosting_type=config['boosting_type'],  # 'gbdt' 'dart'
+                          num_leaves=config['num_leaves'],
+                          max_depth=- 1,
+                          learning_rate=config['learning_rate'],
+                          n_estimators=config['n_estimators'])
+
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-    #Best hyperparameters found were:  {'alpha': 0.005033624874740289, 'l1_ratio': 0.12, 'n_components': 50, 'n_neighbors': 30}  metric:  0.20590244928747334
     # evaluate_model
+
     scores = cross_val_score(model, X, y,
                              scoring='neg_root_mean_squared_error',  # 'neg_mean_absolute_error' make_scorer(rmsle)
                              cv=cv,
@@ -58,10 +52,10 @@ def train_boston(config):
     # force scores to be positive
     scores = abs(scores)
 
-    #print('Mean RMSLE: %.4f (%.4f)' % (scores.mean(), scores.std()))
+    # print('Mean RMSLE: %.4f (%.4f)' % (scores.mean(), scores.std()))
 
     # Creating own metric
-    ray.tune.report(_metric=scores.mean()+2*scores.std())
+    ray.tune.report(_metric=scores.mean() + 2 * scores.std())
 
 
 if __name__ == "__main__":
@@ -83,8 +77,8 @@ if __name__ == "__main__":
     analysis = tune.run(
         train_boston,
         search_alg=HyperOptSearch(),
-        name="elastic_iso",
-        #scheduler=sched_asha, - no need scheduler if there is no iterations
+        name="LGBM",
+        # scheduler=sched_asha, - no need scheduler if there is no iterations
         # Checkpoint settings
         keep_checkpoints_num=3,
         checkpoint_freq=3,
@@ -97,22 +91,24 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 100
         },
-        num_samples=2000,  # number of samples from hyperparameter space
+        num_samples=3000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
-        local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',# default value is ~/ray_results /root/ray_results/  or ~/ray_results
+        local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
+        # default value is ~/ray_results /root/ray_results/  or ~/ray_results
         resources_per_trial={
             "cpu": 16  # ,
             # "gpu": 0
         },
         config={
-            "alpha":  tune.loguniform(1e-5, 100),
-            "l1_ratio":tune.quniform(0, 1, 0.01),
-            "n_components":tune.randint(1, 79),
-            "n_neighbors":tune.randint(3, 30),
+            "learning_rate": tune.loguniform(1e-5, 100),
+            "num_leaves": tune.randint(30, 300),
+            "n_estimators": tune.randint(30, 300),
+            "n_features":tune.randint(60, 79),
+            "boosting_type":tune.choice(['gbdt', 'dart'])
         }
 
     )
     print("Best hyperparameters found were: ", analysis.best_config," metric: ", analysis.best_result['_metric'])
-    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/elastic_iso --bind_all --load_fast=false
+    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/LGBM --bind_all --load_fast=false
 

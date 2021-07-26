@@ -10,7 +10,7 @@ from pathlib import Path
 from sklearn.model_selection import RepeatedKFold, cross_val_score
 from sklearn.linear_model import ElasticNet
 from sklearn.pipeline import Pipeline
-from sklearn.manifold import Isomap
+from sklearn.manifold import LocallyLinearEmbedding
 from sklearn.preprocessing import StandardScaler
 
 
@@ -35,11 +35,11 @@ def train_boston(config):
                     '_MSZoning_3', '_LotConfig_3']
 
 
-    iso=Isomap(n_neighbors=config['n_neighbors'], n_components=config['n_components'])
+    lle=LocallyLinearEmbedding(n_neighbors=config['n_neighbors'], n_components=config['n_components'])
 
     ssc = StandardScaler()
     pipe = Pipeline([
-        ('iso', iso),
+        ('lle', lle),
         ('ssc', ssc),
     ])
 
@@ -47,8 +47,10 @@ def train_boston(config):
     y = df['SalePrice_log1']
 
     model = ElasticNet(alpha=config['alpha'], l1_ratio=config['l1_ratio'])
+    #Best hyperparameters found were:  {'alpha': 0.0006038405842090701, 'l1_ratio': 0.71, 'n_components': 77, 'n_neighbors': 7}  metric:  0.23681043741994184
+
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-    #Best hyperparameters found were:  {'alpha': 0.005033624874740289, 'l1_ratio': 0.12, 'n_components': 50, 'n_neighbors': 30}  metric:  0.20590244928747334
+
     # evaluate_model
     scores = cross_val_score(model, X, y,
                              scoring='neg_root_mean_squared_error',  # 'neg_mean_absolute_error' make_scorer(rmsle)
@@ -83,7 +85,7 @@ if __name__ == "__main__":
     analysis = tune.run(
         train_boston,
         search_alg=HyperOptSearch(),
-        name="elastic_iso",
+        name="elastic_lle",
         #scheduler=sched_asha, - no need scheduler if there is no iterations
         # Checkpoint settings
         keep_checkpoints_num=3,
@@ -114,5 +116,5 @@ if __name__ == "__main__":
 
     )
     print("Best hyperparameters found were: ", analysis.best_config," metric: ", analysis.best_result['_metric'])
-    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/elastic_iso --bind_all --load_fast=false
+    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/elastic_lle --bind_all --load_fast=false
 
