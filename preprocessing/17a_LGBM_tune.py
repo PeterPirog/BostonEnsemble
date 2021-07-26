@@ -101,9 +101,9 @@ if __name__ == "__main__":
             # "gpu": 0
         },
         config={
-            "learning_rate": tune.loguniform(1e-5, 100),
-            "num_leaves": tune.randint(30, 300),
-            "n_estimators": tune.randint(30, 300),
+            "learning_rate": tune.loguniform(1e-5, 1),
+            "num_leaves": tune.randint(30, 50),
+            "n_estimators": tune.randint(50, 150),
             "n_features":tune.randint(60, 79),
             "boosting_type":tune.choice(['gbdt', 'dart'])
         }
