@@ -70,8 +70,9 @@ if __name__ == "__main__":
     conf_ridge['random_state'] = None
 
     conf_ridge['output_file'] = 'model_ridge.joblib'
+    conf_lasso['json_file'] = 'conf_ridge.json'
 
-    with open('conf_ridge.json', 'w') as fp:
+    with open(conf_lasso['json_file'], 'w') as fp:
         json.dump(conf_ridge, fp)
 
     # Make Lasso Configuration
@@ -93,8 +94,9 @@ if __name__ == "__main__":
     conf_lasso['selection'] = 'cyclic'
 
     conf_lasso['output_file'] = 'model_lasso.joblib'
+    conf_lasso['json_file'] = 'conf_lasso.json'
 
-    with open('conf_lasso.json', 'w') as fp:
+    with open(conf_lasso['json_file'], 'w') as fp:
         json.dump(conf_lasso, fp)
 
 
@@ -102,10 +104,10 @@ if __name__ == "__main__":
     # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html?highlight=elastic#sklearn.linear_model.ElasticNet
 
     conf_elastic['all_features'] = conf_global['all_features']
-    conf_elastic['n_features'] = 73
+    conf_elastic['n_features'] = 74
 
-    conf_elastic['alpha'] = 0.0007431419163482603
-    conf_elastic['l1_ratio'] = 0.97
+    conf_elastic['alpha'] = 0.00073
+    conf_elastic['l1_ratio'] = 1.0
     conf_elastic['fit_intercept'] = True
     conf_elastic['normalize'] = False
     conf_elastic['precompute'] = False
@@ -118,8 +120,9 @@ if __name__ == "__main__":
     conf_elastic['selection'] = 'cyclic'
 
     conf_elastic['output_file'] = 'model_elastic.joblib'
+    conf_elastic['json_file'] = 'conf_elastic.json'
 
-    with open('conf_elastic.json', 'w') as fp:
+    with open(conf_elastic['json_file'], 'w') as fp:
         json.dump(conf_elastic, fp)
 
 

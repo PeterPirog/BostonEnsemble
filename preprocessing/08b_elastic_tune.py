@@ -78,7 +78,7 @@ if __name__ == "__main__":
         keep_checkpoints_num=3,
         checkpoint_freq=3,
         checkpoint_at_end=True,
-        verbose=2,
+        verbose=3,
         # Optimalization
         # metric="val_rmsle",  # mean_accuracy
         mode="min",  # max
@@ -96,9 +96,9 @@ if __name__ == "__main__":
             # "gpu": 0
         },
         config={
-            "alpha": tune.loguniform(1e-5, 100),
-            "l1_ratio": tune.quniform(0, 1, 0.01),
-            "n_features": tune.randint(1, 79)
+            "alpha": tune.loguniform(1e-4, 0.1),
+            "l1_ratio": tune.quniform(0, 1, 0.001),
+            "n_features": tune.randint(64, 79)
         }
 
     )

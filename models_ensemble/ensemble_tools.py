@@ -1,6 +1,6 @@
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import RepeatedKFold, cross_val_score
-
+import json
 
 class FeatureByNameSelector(BaseEstimator, TransformerMixin):
     def __init__(self, all_features, n_features=None):
@@ -21,10 +21,11 @@ class FeatureByNameSelector(BaseEstimator, TransformerMixin):
 
 
 class Validator():
-    def __init__(self, model_or_pipeline, X, y, n_splits=10, n_repeats=5, random_state=1,scoring='neg_root_mean_squared_error'):
+    def __init__(self, model_or_pipeline, X, y, n_splits=10, n_repeats=5, random_state=1,scoring='neg_root_mean_squared_error',model_config_dict=None):
         self.model = model_or_pipeline
         self.X = X
         self.y = y
+        self.config_dict=model_config_dict
 
         # cv parameters
         self.n_splits = n_splits
@@ -53,4 +54,13 @@ class Validator():
         self.UBC = self.M + 2 * self.STD
 
         print('Mean error: %.4f (%.4f), UBC= %.4f' % (self.M, self.STD, self.UBC))
+
+        if self.config_dict is None:
+            pass
+        else:
+            self.config_dict['M']=self.M
+            self.config_dict['STD'] = self.STD
+            self.config_dict['UBC'] = self.UBC
+            with open(self.config_dict['json_file'], 'w') as fp:
+                json.dump(self.config_dict, fp)
         return self.M, self.STD, self.UBC
