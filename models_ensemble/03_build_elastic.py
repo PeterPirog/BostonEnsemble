@@ -42,5 +42,5 @@ if __name__ == "__main__":
     # Save pipeline or model in joblib file
     dump(model, filename=conf_elastic['output_file'])
     v = Validator(model_or_pipeline=pipe, X=X, y=y, n_splits=10, n_repeats=5, random_state=1,
-                  scoring='neg_root_mean_squared_error')
+                  scoring='neg_root_mean_squared_error',model_config_dict=conf_elastic)
     v.run()

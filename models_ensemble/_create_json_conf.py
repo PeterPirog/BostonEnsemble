@@ -70,9 +70,9 @@ if __name__ == "__main__":
     conf_ridge['random_state'] = None
 
     conf_ridge['output_file'] = 'model_ridge.joblib'
-    conf_lasso['json_file'] = 'conf_ridge.json'
+    conf_ridge['json_file'] = 'conf_ridge.json'
 
-    with open(conf_lasso['json_file'], 'w') as fp:
+    with open(conf_ridge['json_file'], 'w') as fp:
         json.dump(conf_ridge, fp)
 
     # Make Lasso Configuration
