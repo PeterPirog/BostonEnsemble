@@ -163,4 +163,3 @@ class OneHotNanEncoder(BaseEstimator, TransformerMixin):
         # X[self.new_categories] = X[self.new_categories].astype(self.dtype)
         """
         return X
-

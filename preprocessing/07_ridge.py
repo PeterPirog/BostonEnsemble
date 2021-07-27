@@ -19,7 +19,7 @@ if __name__ == "__main__":
     for i in range(n_features):
 
         X = df[features_all[:i+1]]
-        model = Ridge(alpha=3.5770773153506084,max_iter=3000)
+        model = Ridge(alpha=3.5770773153506084,max_iter=3000,normalize=False)
     
         # define model evaluation method
         cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=1)
