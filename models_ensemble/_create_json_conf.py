@@ -16,6 +16,7 @@ if __name__ == "__main__":
     conf_ridge = {}  # dict with configuration for ridge model
     conf_lasso = {}  # dict with configuration for lasso model
     conf_elastic={}  # dict with configuration for elastic model
+    conf_svr = {}  # dict with configuration for SVR model
 
     # Make global configuration
     conf_global = {}
@@ -125,7 +126,28 @@ if __name__ == "__main__":
     with open(conf_elastic['json_file'], 'w') as fp:
         json.dump(conf_elastic, fp)
 
+    # Make SVR Configuration
+    # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html?highlight=svr#sklearn.svm.SVR
+
+    conf_svr['all_features'] = conf_global['all_features']
+    conf_svr['n_features'] = 74
+
+    conf_svr['kernel'] ='rbf' #‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’
+    conf_svr['degree']=3
+    conf_svr['gamma']='scale' #‘scale’, ‘auto’
+    conf_svr['coef0'] = 0.0
+    conf_svr['tol']=0.001
+    conf_svr['C'] = 1.0
+    conf_svr['epsilon'] = 0.1
+    conf_svr['shrinking'] = True
+    conf_svr['cache_size'] = 200
+    conf_svr['verbose'] = False
+    conf_svr['max_iter'] = -1
+
+    conf_svr['output_file'] = 'model_svr.joblib'
+    conf_svr['json_file'] = 'conf_svr.json'
+
+    with open(conf_svr['json_file'], 'w') as fp:
+        json.dump(conf_svr, fp)
 
 
-# with open('conf_ridge.json', 'r') as fp:
-#     data2 = json.load(fp)

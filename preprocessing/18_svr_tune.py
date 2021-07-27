@@ -7,7 +7,7 @@ import pandas as pd
 
 from pathlib import Path
 from sklearn.model_selection import RepeatedKFold, cross_val_score
-from sklearn.linear_model import  Lasso
+from sklearn.svm import SVR
 
 
 def train_boston(config):
@@ -34,7 +34,12 @@ def train_boston(config):
     y = df['SalePrice_log1']
 
     X = df[features_all[:config['n_features']]]
-    model = Lasso(alpha=config['alpha'], max_iter=config['max_iter'])
+
+    model = SVR(kernel=config['kernel'],
+                degree=config['degree'],
+                gamma=config['gamma'],
+                C=config['C'],
+                epsilon=config['epsilon'])
 
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
     # evaluate_model
@@ -50,7 +55,8 @@ def train_boston(config):
     # print('Mean RMSLE: %.4f (%.4f)' % (scores.mean(), scores.std()))
 
     # Creating own metric
-    ray.tune.report(_metric=scores.mean() + 2 * scores.std())
+    #ray.tune.report(_metric=scores.mean() + 2 * scores.std())
+    ray.tune.report(_metric=scores.mean())
 
 
 if __name__ == "__main__":
@@ -72,7 +78,7 @@ if __name__ == "__main__":
     analysis = tune.run(
         train_boston,
         search_alg=HyperOptSearch(),
-        name="lasso",
+        name="svr",
         # scheduler=sched_asha, - no need scheduler if there is no iterations
         # Checkpoint settings
         keep_checkpoints_num=3,
@@ -96,13 +102,15 @@ if __name__ == "__main__":
             # "gpu": 0
         },
         config={
-            "alpha": tune.loguniform(1e-4, 1e-2),
-            "max_iter": tune.choice([2000]),#tune.qrandint(500, 10000, 500),
-            "n_features": tune.randint(60, 79)
+            "n_features": tune.randint(65, 77), #tune.randint(70, 66)
+            # model parameters
+            'kernel': tune.choice(['rbf']),  # 'linear', 'poly', 'rbf', 'sigmoid'
+            'degree': tune.choice([3]),  # 2, 3
+            'gamma': tune.choice(['scale']),  # scale 'scale', 'auto'
+            'C': tune.loguniform(1e-3, 10),  # 1.0
+            'epsilon': tune.uniform(0.001, 1.0)  # 0.1  tune.loguniform(1e-3, 10)
         }
 
     )
     print("Best hyperparameters found were: ", analysis.best_config)
-    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/lasso --bind_all --load_fast=false
-
-
+    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/svr --bind_all --load_fast=false
