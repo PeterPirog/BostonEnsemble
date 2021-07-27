@@ -13,7 +13,6 @@ if __name__ == "__main__":
     df = pd.read_csv(conf_global['encoded_train_data'])
 
     X = df[conf_global['all_features']]
-
     y = df[conf_global['target_label']]
 
     # Select only 'n_features' labels for X dataframe

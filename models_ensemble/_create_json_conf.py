@@ -15,6 +15,7 @@ if __name__ == "__main__":
     conf_global = {}  # dict with global project configuration
     conf_ridge = {}  # dict with configuration for ridge model
     conf_lasso = {}  # dict with configuration for lasso model
+    conf_elastic={}  # dict with configuration for elastic model
 
     # Make global configuration
     conf_global = {}
@@ -96,6 +97,32 @@ if __name__ == "__main__":
     with open('conf_lasso.json', 'w') as fp:
         json.dump(conf_lasso, fp)
 
-###############
+
+    # Make Elastic Net Configuration
+    # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html?highlight=elastic#sklearn.linear_model.ElasticNet
+
+    conf_elastic['all_features'] = conf_global['all_features']
+    conf_elastic['n_features'] = 73
+
+    conf_elastic['alpha'] = 0.0007431419163482603
+    conf_elastic['l1_ratio'] = 0.97
+    conf_elastic['fit_intercept'] = True
+    conf_elastic['normalize'] = False
+    conf_elastic['precompute'] = False
+    conf_elastic['copy_X'] = True
+    conf_elastic['max_iter'] = 1000
+    conf_elastic['tol'] = 0.0001
+    conf_elastic['warm_start'] = False
+    conf_elastic['positive'] = False
+    conf_elastic['random_state'] = 42
+    conf_elastic['selection'] = 'cyclic'
+
+    conf_elastic['output_file'] = 'model_elastic.joblib'
+
+    with open('conf_elastic.json', 'w') as fp:
+        json.dump(conf_elastic, fp)
+
+
+
 # with open('conf_ridge.json', 'r') as fp:
 #     data2 = json.load(fp)
