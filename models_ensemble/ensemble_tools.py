@@ -3,10 +3,13 @@ from sklearn.model_selection import RepeatedKFold, cross_val_score
 
 
 class FeatureByNameSelector(BaseEstimator, TransformerMixin):
-    def __init__(self, all_features, n_features):
+    def __init__(self, all_features, n_features=None):
         super().__init__()
         self.all_features = all_features
-        self.n_features = n_features
+        if n_features is None:
+            self.n_features=len(self.all_features )
+        else:
+            self.n_features = n_features
         self.feature_list = self.all_features[:self.n_features]
 
     def fit(self, X, y=None):

@@ -12,7 +12,9 @@ def read_config_files(configuration_name='conf_global'):
 
 
 if __name__ == "__main__":
-    # base_path = Path(__file__).parent.parent
+    conf_global = {}  # dict with global project configuration
+    conf_ridge = {}  # dict with configuration for ridge model
+    conf_lasso = {}  # dict with configuration for lasso model
 
     # Make global configuration
     conf_global = {}
@@ -46,7 +48,7 @@ if __name__ == "__main__":
     conf_global['encoded_train_data'] = conf_global['project_path'] + '/data_files/encoded_train_df.csv'
     conf_global['encoded_test_data'] = conf_global['project_path'] + '/data_files/encoded_test_df.csv'
 
-    conf_global['target_label']='SalePrice_log1'
+    conf_global['target_label'] = 'SalePrice_log1'
 
     with open('conf_global.json', 'w') as fp:
         json.dump(conf_global, fp)
@@ -54,7 +56,6 @@ if __name__ == "__main__":
     # Make Ridge Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html?highlight=ridge#sklearn.linear_model.Ridge
 
-    conf_ridge = {}
     conf_ridge['all_features'] = conf_global['all_features']
     conf_ridge['n_features'] = 65
 
@@ -72,10 +73,29 @@ if __name__ == "__main__":
     with open('conf_ridge.json', 'w') as fp:
         json.dump(conf_ridge, fp)
 
+    # Make Lasso Configuration
+    # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html?highlight=lasso#sklearn.linear_model.Lasso
+
+    conf_lasso['all_features'] = conf_global['all_features']
+    conf_lasso['n_features'] = 73
+
+    conf_lasso['alpha'] = 0.0007170579876083573
+    conf_lasso['fit_intercept'] = True
+    conf_lasso['normalize'] = False
+    conf_lasso['precompute'] = False
+    conf_lasso['copy_X'] = True
+    conf_lasso['max_iter'] = 2000
+    conf_lasso['tol'] = 0.0001
+    conf_lasso['warm_start'] = False
+    conf_lasso['positive'] = False
+    conf_lasso['random_state'] = 42
+    conf_lasso['selection'] = 'cyclic'
+
+    conf_lasso['output_file'] = 'model_lasso.joblib'
+
+    with open('conf_lasso.json', 'w') as fp:
+        json.dump(conf_lasso, fp)
 
 ###############
-    with open('conf_ridge.json', 'r') as fp:
-        data2 = json.load(fp)
-
-
-
+# with open('conf_ridge.json', 'r') as fp:
+#     data2 = json.load(fp)
