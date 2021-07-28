@@ -29,14 +29,8 @@ if __name__ == "__main__":
     model_elastic = load(filename='model_elastic.joblib')
     model_svr = load(filename='model_svr.joblib')
     model_kneighbors = load(filename='model_kneighbors.joblib')
-    model_bRidge = load(filename='model_bridge.joblib')
-    model_rforest = RandomForestRegressor(n_estimators=121,  # 122
-                                          criterion='mse',
-                                          max_depth=15,  # 12
-                                          min_samples_split=2,
-                                          min_samples_leaf=1,
-                                          min_weight_fraction_leaf=0.0,
-                                          max_features='auto')
+    model_bridge = load(filename='model_bridge.joblib')
+    model_rforest = load(filename='model_forest.joblib')
 
     model_xgb = XGBRegressor(n_estimators=144,
                              max_depth=6,
@@ -51,7 +45,7 @@ if __name__ == "__main__":
         ('elastic', model_elastic),
         ('svr', model_svr),
         ('kneighbors', model_kneighbors),
-        ('bridge', model_bRidge),
+        ('bridge', model_bridge),
         ('rforest', model_rforest),
         #('xgb', model_xgb)
     ]

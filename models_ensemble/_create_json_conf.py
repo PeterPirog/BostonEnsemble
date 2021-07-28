@@ -207,11 +207,11 @@ if __name__ == "__main__":
     # https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html?highlight=randomforestregressor#sklearn.ensemble.RandomForestRegressor
 
     conf_forest['all_features'] = conf_global['all_features']
-    conf_forest['n_features'] = 65
+    conf_forest['n_features'] = 66
 
-    conf_forest['n_estimators']=100
+    conf_forest['n_estimators']=212
     conf_forest['criterion']='mse'
-    conf_forest['max_depth'] = None
+    conf_forest['max_depth'] = 18
     conf_forest['min_samples_split']=2
     conf_forest['min_samples_leaf'] = 1
     conf_forest['min_weight_fraction_leaf']=0.0
