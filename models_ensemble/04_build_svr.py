@@ -43,4 +43,5 @@ if __name__ == "__main__":
     v = Validator(model_or_pipeline=pipe, X=X, y=y, n_splits=10, n_repeats=5, random_state=1,
                   scoring='neg_root_mean_squared_error',model_config_dict=conf_svr)
     v.run()
+#_metric=0.13138996421177315 and parameters={'n_features': 77, 'kernel': 'rbf', 'degree': 3, 'gamma': 'scale', 'C': 0.7832573311079015, 'epsilon': 0.04825896120073174}
     print(pipe.predict(X[:5]))

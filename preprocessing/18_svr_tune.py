@@ -78,7 +78,7 @@ if __name__ == "__main__":
     analysis = tune.run(
         train_boston,
         search_alg=HyperOptSearch(),
-        name="svr",
+        name="svr2",
         # scheduler=sched_asha, - no need scheduler if there is no iterations
         # Checkpoint settings
         keep_checkpoints_num=3,
@@ -102,10 +102,10 @@ if __name__ == "__main__":
             # "gpu": 0
         },
         config={
-            "n_features": tune.randint(65, 77), #tune.randint(70, 66)
+            "n_features": tune.randint(65, 79), #tune.randint(70, 66)
             # model parameters
-            'kernel': tune.choice(['rbf']),  # 'linear', 'poly', 'rbf', 'sigmoid'
-            'degree': tune.choice([3]),  # 2, 3
+            'kernel': tune.choice(['linear', 'poly', 'rbf', 'sigmoid']),  # 'linear', 'poly', 'rbf', 'sigmoid'
+            'degree': tune.choice([2,3]),  # 2, 3
             'gamma': tune.choice(['scale']),  # scale 'scale', 'auto'
             'C': tune.loguniform(1e-3, 10),  # 1.0
             'epsilon': tune.uniform(0.001, 1.0)  # 0.1  tune.loguniform(1e-3, 10)
@@ -113,4 +113,4 @@ if __name__ == "__main__":
 
     )
     print("Best hyperparameters found were: ", analysis.best_config)
-    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/svr --bind_all --load_fast=false
+    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/svr2 --bind_all --load_fast=false

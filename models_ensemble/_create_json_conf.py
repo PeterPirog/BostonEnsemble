@@ -19,6 +19,7 @@ if __name__ == "__main__":
     conf_svr = {}  # dict with configuration for SVR model
     conf_kneighbors= {} # dict with configuration for kneighbors model
     conf_bridge = {}  # dict with configuration for  bayesian ridge model
+    conf_forest={} # dict with configuration for  random forest model
 
     # Make global configuration
     conf_global = {}
@@ -132,15 +133,15 @@ if __name__ == "__main__":
     # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html?highlight=svr#sklearn.svm.SVR
 
     conf_svr['all_features'] = conf_global['all_features']
-    conf_svr['n_features'] = 74
+    conf_svr['n_features'] = 77
 
     conf_svr['kernel'] ='rbf' #‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’
     conf_svr['degree']=3
     conf_svr['gamma']='scale' #‘scale’, ‘auto’
     conf_svr['coef0'] = 0.0
     conf_svr['tol']=0.001
-    conf_svr['C'] = 1.0
-    conf_svr['epsilon'] = 0.1
+    conf_svr['C'] = 0.7832573311079015
+    conf_svr['epsilon'] = 0.04825896120073174
     conf_svr['shrinking'] = True
     conf_svr['cache_size'] = 200
     conf_svr['verbose'] = False
@@ -200,3 +201,35 @@ if __name__ == "__main__":
 
     with open(conf_bridge['json_file'], 'w') as fp:
         json.dump(conf_bridge, fp)
+
+
+    # Make Random Forest Configuration
+    # https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html?highlight=randomforestregressor#sklearn.ensemble.RandomForestRegressor
+
+    conf_forest['all_features'] = conf_global['all_features']
+    conf_forest['n_features'] = 65
+
+    conf_forest['n_estimators']=100
+    conf_forest['criterion']='mse'
+    conf_forest['max_depth'] = None
+    conf_forest['min_samples_split']=2
+    conf_forest['min_samples_leaf'] = 1
+    conf_forest['min_weight_fraction_leaf']=0.0
+    conf_forest['max_features']='auto'
+    conf_forest['max_leaf_nodes']=None
+    conf_forest['min_impurity_decrease']=0.0
+    conf_forest['min_impurity_split']=None
+    conf_forest['bootstrap']=True
+    conf_forest['oob_score'] =False
+    conf_forest['n_jobs']=-1
+    conf_forest['random_state']=None
+    conf_forest['verbose']=0
+    conf_forest['warm_start']=False
+    conf_forest['ccp_alpha']=0.0
+    conf_forest['max_samples']=None
+
+    conf_forest['output_file'] = 'model_forest.joblib'
+    conf_forest['json_file'] = 'conf_forest.json'
+
+    with open(conf_forest['json_file'], 'w') as fp:
+        json.dump(conf_forest, fp)

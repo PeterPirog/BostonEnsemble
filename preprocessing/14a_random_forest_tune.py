@@ -41,7 +41,8 @@ def train_boston(config):
                                   min_samples_split=2,
                                   min_samples_leaf=1,
                                   min_weight_fraction_leaf=0.0,
-                                  max_features='auto')
+                                  max_features='auto',
+                                  n_jobs=-1)
 
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
 
@@ -104,7 +105,7 @@ if __name__ == "__main__":
         },
         config={
             "n_estimators": tune.randint(5, 250),
-            "max_depth": tune.randint(2, 15),
+            "max_depth": tune.randint(2, 20),
             "n_features": tune.randint(60, 79)
         }
 
