@@ -57,7 +57,7 @@ def train_boston(config):
     # print('Mean RMSLE: %.4f (%.4f)' % (scores.mean(), scores.std()))
 
     # Creating own metric
-    ray.tune.report(_metric=scores.mean() + 2 * scores.std())
+    ray.tune.report(_metric=scores.mean())
 
 
 if __name__ == "__main__":
@@ -93,7 +93,7 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 100
         },
-        num_samples=1000,  # number of samples from hyperparameter space
+        num_samples=3000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
         local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
@@ -105,7 +105,7 @@ if __name__ == "__main__":
         config={
             "n_estimators": tune.randint(5, 250),
             "max_depth": tune.randint(2, 15),
-            "n_features": tune.randint(1, 79)
+            "n_features": tune.randint(60, 79)
         }
 
     )

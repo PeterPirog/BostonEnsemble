@@ -52,7 +52,7 @@ if __name__ == "__main__":
         ('svr', model_svr),
         ('kneighbors', model_kneighbors),
         ('bridge', model_bRidge),
-        #('rforest', model_rforest),
+        ('rforest', model_rforest),
         #('xgb', model_xgb)
     ]
     model = StackingRegressor(
