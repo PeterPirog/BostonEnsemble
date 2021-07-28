@@ -85,7 +85,7 @@ if __name__ == "__main__":
         keep_checkpoints_num=3,
         checkpoint_freq=3,
         checkpoint_at_end=True,
-        verbose=2,
+        verbose=3,
         # Optimalization
         # metric="val_rmsle",  # mean_accuracy
         mode="min",  # max
