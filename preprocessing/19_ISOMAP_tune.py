@@ -7,8 +7,8 @@ import pandas as pd
 
 from pathlib import Path
 from sklearn.model_selection import RepeatedKFold, cross_val_score
-from sklearn.linear_model import BayesianRidge
-
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.neighbors import KNeighborsRegressor
 
 def train_boston(config):
     base_path = Path(__file__).parent.parent
@@ -34,16 +34,14 @@ def train_boston(config):
     y = df['SalePrice_log1']
 
     X = df[features_all[:config['n_features']]]
-
-    model = BayesianRidge(n_iter=config['n_iter'], tol=0.001,
-                          alpha_1=config['alpha_1'],
-                          alpha_2=config['alpha_2'],
-                          lambda_1=config['lambda_1'],
-                          lambda_2=config['lambda_2'])
+    # model
+    model = KNeighborsRegressor(n_neighbors=config["n_neighbors"],
+                                weights=config["weights"],# {‘uniform’, ‘distance’}
+                                p=config["p"])
 
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
-    # evaluate_model
 
+    # evaluate_model
     scores = cross_val_score(model, X, y,
                              scoring='neg_root_mean_squared_error',  # 'neg_mean_absolute_error' make_scorer(rmsle)
                              cv=cv,
@@ -77,7 +75,8 @@ if __name__ == "__main__":
     analysis = tune.run(
         train_boston,
         search_alg=HyperOptSearch(),
-        name="bayesian_ridge",
+        #name="neighbour",
+        name="xgboost",
         # scheduler=sched_asha, - no need scheduler if there is no iterations
         # Checkpoint settings
         keep_checkpoints_num=3,
@@ -94,23 +93,23 @@ if __name__ == "__main__":
         num_samples=3000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
-        local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
+        #local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
+        local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/xgboost/ray_results',
         # default value is ~/ray_results /root/ray_results/  or ~/ray_results
         resources_per_trial={
             "cpu": 16  # ,
             # "gpu": 0
         },
         config={
-            "alpha_1": tune.loguniform(1e-7, 1),
-            "alpha_2": tune.loguniform(1e-7, 1),
-            "lambda_1": tune.loguniform(1e-7, 1000),
-            "lambda_2": tune.loguniform(1e-7, 1000),
-            "n_iter": tune.choice([300]),
+            "n_neighbors": tune.randint(3, 100),
+            "weights": tune.choice(["uniform", "distance"]),
+            "p": tune.randint(1, 3),
             "n_features": tune.randint(60, 79)
         }
 
     )
     print("Best hyperparameters found were: ", analysis.best_config)
-    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/bayesian_ridge --bind_all --load_fast=false
-# _metric=0.13607775581429057 and parameters={'alpha_1': 3.114173891282374e-07, 'alpha_2': 0.0006005301305242927, 'lambda_1': 986.4034769373696, 'lambda_2': 3.3576325805597858, 'n_iter': 300, 'n_features': 65}
+    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/neighbour --bind_all --load_fast=false
+    # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/xgboost/ray_results/xgboost --bind_all
 
+    #_metric=0.16410769539515846 and parameters={'n_neighbors': 7, 'weights': 'distance', 'p': 1, 'n_features': 65}

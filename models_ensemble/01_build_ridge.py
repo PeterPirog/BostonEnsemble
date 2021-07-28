@@ -45,4 +45,5 @@ if __name__ == "__main__":
                   scoring='neg_root_mean_squared_error',model_config_dict=conf_ridge)
     v.run()
 
+    print(pipe.predict(X[:5]))
 

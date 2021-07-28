@@ -43,3 +43,4 @@ if __name__ == "__main__":
     v = Validator(model_or_pipeline=pipe, X=X, y=y, n_splits=10, n_repeats=5, random_state=1,
                   scoring='neg_root_mean_squared_error',model_config_dict=conf_lasso)
     v.run()
+    print(pipe.predict(X[:5]))

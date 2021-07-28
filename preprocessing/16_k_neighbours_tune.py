@@ -37,7 +37,8 @@ def train_boston(config):
     # model
     model = KNeighborsRegressor(n_neighbors=config["n_neighbors"],
                                 weights=config["weights"],# {‘uniform’, ‘distance’}
-                                p=config["p"])
+                                p=config["p"],
+                                leaf_size=config["leaf_size"])
 
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
 
@@ -53,7 +54,7 @@ def train_boston(config):
     # print('Mean RMSLE: %.4f (%.4f)' % (scores.mean(), scores.std()))
 
     # Creating own metric
-    ray.tune.report(_metric=scores.mean() + 2 * scores.std())
+    ray.tune.report(_metric=scores.mean())
 
 
 if __name__ == "__main__":
@@ -82,7 +83,7 @@ if __name__ == "__main__":
         keep_checkpoints_num=3,
         checkpoint_freq=3,
         checkpoint_at_end=True,
-        verbose=2,
+        verbose=3,
         # Optimalization
         # metric="val_rmsle",  # mean_accuracy
         mode="min",  # max
@@ -90,7 +91,7 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 100
         },
-        num_samples=30,  # number of samples from hyperparameter space
+        num_samples=3000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
         #local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
@@ -102,9 +103,10 @@ if __name__ == "__main__":
         },
         config={
             "n_neighbors": tune.randint(3, 100),
+            "leaf_size": tune.randint(1, 101),
             "weights": tune.choice(["uniform", "distance"]),
             "p": tune.randint(1, 3),
-            "n_features": tune.randint(1, 79)
+            "n_features": tune.randint(60, 79)
         }
 
     )
@@ -112,5 +114,4 @@ if __name__ == "__main__":
     # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/neighbour --bind_all --load_fast=false
     # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/xgboost/ray_results/xgboost --bind_all
 
-    # https://towardsdatascience.com/beyond-grid-search-hypercharge-hyperparameter-tuning-for-xgboost-7c78f7a2929d
-    #tensorboard --inspect --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/xgboost/ray_results/xgboost
+    #_metric=0.16410769539515846 and parameters={'n_neighbors': 7, 'weights': 'distance', 'p': 1, 'n_features': 65}

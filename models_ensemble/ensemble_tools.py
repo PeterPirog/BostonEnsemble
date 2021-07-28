@@ -2,12 +2,13 @@ from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.model_selection import RepeatedKFold, cross_val_score
 import json
 
+
 class FeatureByNameSelector(BaseEstimator, TransformerMixin):
     def __init__(self, all_features, n_features=None):
         super().__init__()
         self.all_features = all_features
         if n_features is None:
-            self.n_features=len(self.all_features )
+            self.n_features = len(self.all_features)
         else:
             self.n_features = n_features
         self.feature_list = self.all_features[:self.n_features]
@@ -19,13 +20,18 @@ class FeatureByNameSelector(BaseEstimator, TransformerMixin):
         X_ = X.copy()
         return X_[self.feature_list]
 
+    def predict(self, X):
+        X_ = X.copy()
+        return X_[self.feature_list]
+
 
 class Validator():
-    def __init__(self, model_or_pipeline, X, y, n_splits=10, n_repeats=5, random_state=1,scoring='neg_root_mean_squared_error',model_config_dict=None):
+    def __init__(self, model_or_pipeline, X, y, n_splits=10, n_repeats=5, random_state=1,
+                 scoring='neg_root_mean_squared_error', model_config_dict=None):
         self.model = model_or_pipeline
         self.X = X
         self.y = y
-        self.config_dict=model_config_dict
+        self.config_dict = model_config_dict
 
         # cv parameters
         self.n_splits = n_splits
@@ -33,10 +39,10 @@ class Validator():
         self.random_state = random_state
         self.scoring = scoring
 
-        #results
-        self.M=None
-        self.STD=None
-        self.UBC=None
+        # results
+        self.M = None
+        self.STD = None
+        self.UBC = None
 
         self.cv = RepeatedKFold(n_splits=self.n_splits, n_repeats=self.n_repeats, random_state=self.random_state)
         # evaluate_model
@@ -58,7 +64,7 @@ class Validator():
         if self.config_dict is None:
             pass
         else:
-            self.config_dict['M']=self.M
+            self.config_dict['M'] = self.M
             self.config_dict['STD'] = self.STD
             self.config_dict['UBC'] = self.UBC
             with open(self.config_dict['json_file'], 'w') as fp:

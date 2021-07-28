@@ -17,6 +17,8 @@ if __name__ == "__main__":
     conf_lasso = {}  # dict with configuration for lasso model
     conf_elastic={}  # dict with configuration for elastic model
     conf_svr = {}  # dict with configuration for SVR model
+    conf_kneighbors= {} # dict with configuration for kneighbors model
+    conf_bridge = {}  # dict with configuration for  bayesian ridge model
 
     # Make global configuration
     conf_global = {}
@@ -150,4 +152,51 @@ if __name__ == "__main__":
     with open(conf_svr['json_file'], 'w') as fp:
         json.dump(conf_svr, fp)
 
+# Make KNeighbors Configuration
+    # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html?highlight=svr#sklearn.svm.SVR
 
+    conf_kneighbors['all_features'] = conf_global['all_features']
+    conf_kneighbors['n_features'] = 65
+
+    conf_kneighbors['n_neighbors'] =7
+    conf_kneighbors['weights'] = 'distance'
+    conf_kneighbors['algorithm']='auto'
+    conf_kneighbors['leaf_size']=83
+    conf_kneighbors['p']=1
+    conf_kneighbors['metric'] = 'minkowski'
+    conf_kneighbors['metric_params'] = None
+    conf_kneighbors['n_jobs'] = -1
+
+
+    conf_kneighbors['output_file'] = 'model_kneighbors.joblib'
+    conf_kneighbors['json_file'] = 'conf_kneighbors.json'
+
+    with open(conf_kneighbors['json_file'], 'w') as fp:
+        json.dump(conf_kneighbors, fp)
+
+
+    # Make Bayesian Ridge Configuration
+    # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html?highlight=ridge#sklearn.linear_model.Ridge
+
+    conf_bridge['all_features'] = conf_global['all_features']
+    conf_bridge['n_features'] = 65
+
+    conf_bridge['n_iter'] = 300
+    conf_bridge['tol'] = 0.001
+    conf_bridge['alpha_1'] = 3.114173891282374e-07
+    conf_bridge['alpha_2'] = 0.0006005301305242927
+    conf_bridge['lambda_1'] = 986.4034769373696
+    conf_bridge['lambda_2'] = 3.3576325805597858
+    conf_bridge['alpha_init'] = None
+    conf_bridge['lambda_init'] = None
+    conf_bridge['compute_score'] = False
+    conf_bridge['fit_intercept'] = True
+    conf_bridge['normalize'] = False
+    conf_bridge['copy_X'] = True
+    conf_bridge['verbose'] = False
+
+    conf_bridge['output_file'] = 'model_bridge.joblib'
+    conf_bridge['json_file'] = 'conf_bridge.json'
+
+    with open(conf_bridge['json_file'], 'w') as fp:
+        json.dump(conf_bridge, fp)
