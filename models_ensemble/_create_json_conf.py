@@ -20,6 +20,7 @@ if __name__ == "__main__":
     conf_kneighbors= {} # dict with configuration for kneighbors model
     conf_bridge = {}  # dict with configuration for  bayesian ridge model
     conf_forest={} # dict with configuration for  random forest model
+    conf_keras={} # dict with configuration for  keras dense 2 layer model
 
     # Make global configuration
     conf_global = {}
@@ -233,3 +234,21 @@ if __name__ == "__main__":
 
     with open(conf_forest['json_file'], 'w') as fp:
         json.dump(conf_forest, fp)
+
+    # Make Keras Configuration
+
+    conf_keras['all_features'] = conf_global['all_features']
+    #conf_keras['n_features'] = 66
+
+    conf_keras['batch']=64
+    conf_keras['learning_rate'] =0.001  #0.1
+    conf_keras['hidden']=31
+    conf_keras['activation']='elu'
+    conf_keras['dropout']=0.28
+
+    conf_keras['output_file'] = 'model_keras.joblib'
+    conf_keras['json_file'] = 'conf_keras.json'
+
+    with open(conf_keras['json_file'], 'w') as fp:
+        json.dump(conf_keras, fp)
+

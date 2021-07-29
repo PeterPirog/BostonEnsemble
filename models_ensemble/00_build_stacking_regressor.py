@@ -38,7 +38,7 @@ if __name__ == "__main__":
                              subsample=1,
                              colsample_bytree=1)
 
-    cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=1)
+    #cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=1)
     estimators = [
         ('ridge', model_ridge),
         ('lasso', model_lasso),
