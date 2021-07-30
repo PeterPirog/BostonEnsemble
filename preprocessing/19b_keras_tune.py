@@ -37,7 +37,7 @@ def train_boston(config):
 
     X = X.to_numpy()
     y = y.to_numpy()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, shuffle=True,random_state=config["random_state"])
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, shuffle=True,random_state=None)
 
     epochs = 100000
     # define model
@@ -143,7 +143,6 @@ if __name__ == "__main__":
             "gpu": 0
         },
         config={
-            "random_state": tune.randint(10, 200),
             # training parameters
             "batch": tune.choice([64]),
             "learning_rate": tune.choice([0.1]),#tune.loguniform(1e-5, 1e-2)

@@ -37,7 +37,7 @@ def train_boston(config):
 
     X = X.to_numpy()
     y = y.to_numpy()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.25, shuffle=True,random_state=config["random_state"])
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True,random_state=None)
 
     epochs = 100000
     # define model
@@ -50,7 +50,7 @@ def train_boston(config):
     x = tf.keras.layers.LayerNormalization()(x)
     x = tf.keras.layers.Dropout(config["dropout1"])(x)
     # layer 2
-    x = tf.keras.layers.Dense(units=config["hidden1"], kernel_initializer='glorot_normal',
+    x = tf.keras.layers.Dense(units=config["hidden2"], kernel_initializer='glorot_normal',
                               activation=config["activation1"])(x)
     x = tf.keras.layers.LayerNormalization()(x)
     x = tf.keras.layers.Dropout(config["dropout1"])(x)
@@ -65,8 +65,10 @@ def train_boston(config):
         metrics='mean_squared_error')  # accuracy mean_squared_logarithmic_error
 
     callbacks_list = [tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
-                                                           factor=0.1,
+                                                           factor=0.5,
                                                            patience=10),
+                      tf.keras.callbacks.EarlyStopping(monitor='val_loss',
+                                                       patience=15),
                       TuneReportCallback({'val_loss': 'val_loss'})]
 
     model.fit(
@@ -103,7 +105,7 @@ if __name__ == "__main__":
     """
     sched_asha = ASHAScheduler(time_attr="training_iteration",
                                max_t=5000,
-                               grace_period=15,
+                               grace_period=20,
                                # mode='max', #find maximum, do not define here if you define in tune.run
                                reduction_factor=3,
                                # brackets=1
@@ -127,7 +129,7 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 5000
         },
-        num_samples=1000,  # number of samples from hyperparameter space
+        num_samples=5000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
         local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
@@ -137,12 +139,12 @@ if __name__ == "__main__":
             "gpu": 0
         },
         config={
-            "random_state": tune.randint(10, 200),
             # training parameters
             "batch": tune.choice([64]),
             "learning_rate": tune.choice([0.1]),#tune.loguniform(1e-5, 1e-2)
             # Layer 1 params
-            "hidden1": tune.randint(10, 200),
+            "hidden1": tune.randint(5, 200),
+            "hidden2": tune.randint(5, 200),
             "activation1": tune.choice(["elu"]),
             "dropout1": tune.quniform(0.01, 0.5, 0.01),#tune.uniform(0.01, 0.15)
         }
@@ -152,6 +154,6 @@ if __name__ == "__main__":
 # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/keras --bind_all --load_fast=false
 """
 2 Layers
-val_loss=0.021217023953795433 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 59, 'activation1': 'elu', 'dropout1': 0.02}
+val_loss=0.013803128153085709 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 40, 'activation1': 'elu', 'dropout1': 0.46}
 val_loss=0.016657643020153046 and parameters={'random_state': 117, 'batch': 64, 'learning_rate': 0.1, 'hidden1': 31, 'activation1': 'elu', 'dropout1': 0.28}
 """

@@ -15,12 +15,12 @@ if __name__ == "__main__":
     conf_global = {}  # dict with global project configuration
     conf_ridge = {}  # dict with configuration for ridge model
     conf_lasso = {}  # dict with configuration for lasso model
-    conf_elastic={}  # dict with configuration for elastic model
+    conf_elastic = {}  # dict with configuration for elastic model
     conf_svr = {}  # dict with configuration for SVR model
-    conf_kneighbors= {} # dict with configuration for kneighbors model
+    conf_kneighbors = {}  # dict with configuration for kneighbors model
     conf_bridge = {}  # dict with configuration for  bayesian ridge model
-    conf_forest={} # dict with configuration for  random forest model
-    conf_keras={} # dict with configuration for  keras dense 2 layer model
+    conf_forest = {}  # dict with configuration for  random forest model
+    conf_keras = {}  # dict with configuration for  keras dense 2 layer model
 
     # Make global configuration
     conf_global = {}
@@ -104,7 +104,6 @@ if __name__ == "__main__":
     with open(conf_lasso['json_file'], 'w') as fp:
         json.dump(conf_lasso, fp)
 
-
     # Make Elastic Net Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html?highlight=elastic#sklearn.linear_model.ElasticNet
 
@@ -136,11 +135,11 @@ if __name__ == "__main__":
     conf_svr['all_features'] = conf_global['all_features']
     conf_svr['n_features'] = 77
 
-    conf_svr['kernel'] ='rbf' #‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’
-    conf_svr['degree']=3
-    conf_svr['gamma']='scale' #‘scale’, ‘auto’
+    conf_svr['kernel'] = 'rbf'  # ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’
+    conf_svr['degree'] = 3
+    conf_svr['gamma'] = 'scale'  # ‘scale’, ‘auto’
     conf_svr['coef0'] = 0.0
-    conf_svr['tol']=0.001
+    conf_svr['tol'] = 0.001
     conf_svr['C'] = 0.7832573311079015
     conf_svr['epsilon'] = 0.04825896120073174
     conf_svr['shrinking'] = True
@@ -154,28 +153,26 @@ if __name__ == "__main__":
     with open(conf_svr['json_file'], 'w') as fp:
         json.dump(conf_svr, fp)
 
-# Make KNeighbors Configuration
+    # Make KNeighbors Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html?highlight=svr#sklearn.svm.SVR
 
     conf_kneighbors['all_features'] = conf_global['all_features']
     conf_kneighbors['n_features'] = 65
 
-    conf_kneighbors['n_neighbors'] =7
+    conf_kneighbors['n_neighbors'] = 7
     conf_kneighbors['weights'] = 'distance'
-    conf_kneighbors['algorithm']='auto'
-    conf_kneighbors['leaf_size']=83
-    conf_kneighbors['p']=1
+    conf_kneighbors['algorithm'] = 'auto'
+    conf_kneighbors['leaf_size'] = 83
+    conf_kneighbors['p'] = 1
     conf_kneighbors['metric'] = 'minkowski'
     conf_kneighbors['metric_params'] = None
     conf_kneighbors['n_jobs'] = -1
-
 
     conf_kneighbors['output_file'] = 'model_kneighbors.joblib'
     conf_kneighbors['json_file'] = 'conf_kneighbors.json'
 
     with open(conf_kneighbors['json_file'], 'w') as fp:
         json.dump(conf_kneighbors, fp)
-
 
     # Make Bayesian Ridge Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html?highlight=ridge#sklearn.linear_model.Ridge
@@ -203,31 +200,30 @@ if __name__ == "__main__":
     with open(conf_bridge['json_file'], 'w') as fp:
         json.dump(conf_bridge, fp)
 
-
     # Make Random Forest Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html?highlight=randomforestregressor#sklearn.ensemble.RandomForestRegressor
 
     conf_forest['all_features'] = conf_global['all_features']
     conf_forest['n_features'] = 66
 
-    conf_forest['n_estimators']=212
-    conf_forest['criterion']='mse'
+    conf_forest['n_estimators'] = 212
+    conf_forest['criterion'] = 'mse'
     conf_forest['max_depth'] = 18
-    conf_forest['min_samples_split']=2
+    conf_forest['min_samples_split'] = 2
     conf_forest['min_samples_leaf'] = 1
-    conf_forest['min_weight_fraction_leaf']=0.0
-    conf_forest['max_features']='auto'
-    conf_forest['max_leaf_nodes']=None
-    conf_forest['min_impurity_decrease']=0.0
-    conf_forest['min_impurity_split']=None
-    conf_forest['bootstrap']=True
-    conf_forest['oob_score'] =False
-    conf_forest['n_jobs']=-1
-    conf_forest['random_state']=None
-    conf_forest['verbose']=0
-    conf_forest['warm_start']=False
-    conf_forest['ccp_alpha']=0.0
-    conf_forest['max_samples']=None
+    conf_forest['min_weight_fraction_leaf'] = 0.0
+    conf_forest['max_features'] = 'auto'
+    conf_forest['max_leaf_nodes'] = None
+    conf_forest['min_impurity_decrease'] = 0.0
+    conf_forest['min_impurity_split'] = None
+    conf_forest['bootstrap'] = True
+    conf_forest['oob_score'] = False
+    conf_forest['n_jobs'] = -1
+    conf_forest['random_state'] = None
+    conf_forest['verbose'] = 0
+    conf_forest['warm_start'] = False
+    conf_forest['ccp_alpha'] = 0.0
+    conf_forest['max_samples'] = None
 
     conf_forest['output_file'] = 'model_forest.joblib'
     conf_forest['json_file'] = 'conf_forest.json'
@@ -238,17 +234,36 @@ if __name__ == "__main__":
     # Make Keras Configuration
 
     conf_keras['all_features'] = conf_global['all_features']
-    #conf_keras['n_features'] = 66
+    # conf_keras['n_features'] = 66
 
-    conf_keras['batch']=64
-    conf_keras['learning_rate'] =0.001  #0.1
-    conf_keras['hidden']=31
-    conf_keras['activation']='elu'
-    conf_keras['dropout']=0.28
+    conf_keras['learning_rate'] = 0.1  # 0.1
+    conf_keras['hidden1'] = 40
+    conf_keras['hidden2'] = 40
+    conf_keras['activation'] = 'elu'
+    conf_keras['dropout'] = 0.46
+    # fit method parameters
+    conf_keras['x'] = None
+    conf_keras['y'] = None
+    conf_keras['batch_size'] = 64
+    conf_keras['epochs'] = 5000
+    conf_keras['verbose'] = "auto"
+    conf_keras['callbacks'] = None
+    conf_keras['validation_split'] = 0.2
+    conf_keras['validation_data'] = None
+    conf_keras['shuffle'] = True
+    conf_keras['class_weight'] = None
+    conf_keras['sample_weight'] = None
+    conf_keras['initial_epoch'] = 0
+    conf_keras['steps_per_epoch'] = None
+    conf_keras['validation_steps'] = None
+    conf_keras['validation_batch_size'] = None
+    conf_keras['validation_freq'] = 1
+    conf_keras['max_queue_size'] = 10
+    conf_keras['workers'] = 1
+    conf_keras['use_multiprocessing'] = True
 
     conf_keras['output_file'] = 'model_keras.joblib'
     conf_keras['json_file'] = 'conf_keras.json'
 
     with open(conf_keras['json_file'], 'w') as fp:
         json.dump(conf_keras, fp)
-

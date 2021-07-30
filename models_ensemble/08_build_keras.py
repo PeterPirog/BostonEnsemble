@@ -20,7 +20,7 @@ from ensemble_tools import FeatureByNameSelector, Validator
 from _create_json_conf import read_config_files
 
 # define base model
-def baseline_model(hidden_layers,dropout,lr=0.001):
+def baseline_model(hidden1,hidden2,activation,dropout,lr):
 	# create model
     epochs = 100000
     number_inputs=79
@@ -32,12 +32,12 @@ def baseline_model(hidden_layers,dropout,lr=0.001):
     x = tf.keras.layers.Flatten()(inputs)
     x = tf.keras.layers.LayerNormalization()(x)
     # layer 1
-    x = tf.keras.layers.Dense(units=hidden_layers, kernel_initializer='glorot_normal',
+    x = tf.keras.layers.Dense(units=hidden1, kernel_initializer='glorot_normal',
                               activation=activation)(x)
     x = tf.keras.layers.LayerNormalization()(x)
     x = tf.keras.layers.Dropout(dropout)(x)
     # layer 2
-    x = tf.keras.layers.Dense(units=hidden_layers, kernel_initializer='glorot_normal',
+    x = tf.keras.layers.Dense(units=hidden2, kernel_initializer='glorot_normal',
                               activation=activation)(x)
     x = tf.keras.layers.LayerNormalization()(x)
     x = tf.keras.layers.Dropout(dropout)(x)
@@ -52,7 +52,9 @@ def baseline_model(hidden_layers,dropout,lr=0.001):
         metrics='mean_squared_error')
     return model
 
-
+def load_keras_model():
+    model = tf.keras.models.load_model('model_keras.h5')
+    return model
 
 if __name__ == "__main__":
     conf_global = read_config_files(configuration_name='conf_global')
@@ -62,46 +64,79 @@ if __name__ == "__main__":
 
 
 
-    X = df[conf_global['all_features']]
+    X = df[conf_global['all_features']].to_numpy()
 
-    y = df[conf_global['target_label']]
+    y = df[conf_global['target_label']].to_numpy()
+
+    X=tf.cast(X, dtype=tf.bfloat16)
+    y = tf.cast(y, dtype=tf.bfloat16)
 
     # fix random seed for reproducibility
     seed = 7
     np.random.seed(seed)
 
-    callbacks_list = [tf.keras.callbacks.ReduceLROnPlateau(monitor='mean_squared_error',
+    callbacks_list = [tf.keras.callbacks.EarlyStopping(monitor='val_loss',
+                                                       patience=15),
+                      tf.keras.callbacks.ReduceLROnPlateau(monitor='val_loss',
                                                            factor=0.1,
-                                                           patience=10), ]
+                                                           patience=10),
+                      tf.keras.callbacks.ModelCheckpoint(filepath='model_keras.h5',
+                                                         monitor='val_loss',
+                                                         save_best_only=True),]
 
     estimator = KerasRegressor(build_fn=baseline_model,
                                ## custom parameters
-                               hidden_layers=31,
-                               dropout=0.28,
-                               lr=0.1,
+                               hidden1=conf_keras['hidden1'],
+                               hidden2=conf_keras['hidden2'],
+                               activation=conf_keras['activation'],
+                               dropout=conf_keras['dropout'],
+                               lr=conf_keras['learning_rate'],
                                ## fit parameters
-                               nb_epoch=1500,
-                               batch_size=64,
-                               verbose='auto',
+                               #x=None,#conf_keras['x']
+                               #y=None,#conf_keras['y']
+                               batch_size=conf_keras['batch_size'],
+                               epochs=conf_keras['epochs'],
+                               verbose=conf_keras['verbose'],
                                callbacks=callbacks_list,
-                               workers=64,use_multiprocessing=True)
+                               validation_split=conf_keras['validation_split'],
+                               validation_data=conf_keras['validation_data'],
+                               shuffle=conf_keras['shuffle'],
+                               class_weight=conf_keras['class_weight'],
+                               sample_weight=conf_keras['sample_weight'],
+                               initial_epoch=conf_keras['initial_epoch'] ,
+                               steps_per_epoch=conf_keras['steps_per_epoch'],
+                               validation_steps=conf_keras['validation_steps'],
+                               validation_batch_size=conf_keras['validation_batch_size'],
+                               validation_freq=conf_keras['validation_freq'],
+                               max_queue_size=conf_keras['max_queue_size'],
+                               workers=conf_keras['workers'],
+                               use_multiprocessing=conf_keras['use_multiprocessing'],
+                               )
 
-    kfold = KFold(n_splits=10, random_state=seed,shuffle=True)
-    results = cross_val_score(estimator, X, y, cv=kfold, n_jobs=-1)
-    print("Results: %.2f (%.2f) MSE" % (results.mean(), results.std()))
+    estimator.fit(x=X,y=y)
+
+
+    #Save pipeline or model in joblib file
+    estimator2 = KerasRegressor(build_fn=load_keras_model,epochs=1)
+    dump(estimator2, filename='model_keras.joblib')#conf_keras['output_file']
+
+
+    #kfold = KFold(n_splits=10, random_state=seed,shuffle=True)
+    #results = cross_val_score(estimator, X, y, cv=kfold, n_jobs=-1)
+    #print("Results: %.2f (%.2f) MSE" % (results.mean(), results.std()))
 
     """
     #train model with parameters defined in conf_ridge,json file
     estimator.fit(X=X, y=y)
 
-    #Save pipeline or model in joblib file
-    #dump(estimator, filename=conf_ridge['output_file'])
+
     v = Validator(model_or_pipeline=estimator, X=X, y=y, n_splits=10, n_repeats=5, random_state=1,
                   scoring='neg_root_mean_squared_error',model_config_dict=None)
     v.run()
     """
-    #print(estimator.predict(X[:5]))
-    print(estimator)
+    model_keras = load(filename='model_keras.joblib')
+    print(model_keras.predict(X[:5]))
+    #print(estimator)
 
 """
 Model.fit(
@@ -125,6 +160,6 @@ Model.fit(
     workers=1,
     use_multiprocessing=False,
 )
-
+val_loss=0.013803128153085709 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 40, 'activation1': 'elu', 'dropout1': 0.46}
 
 """
