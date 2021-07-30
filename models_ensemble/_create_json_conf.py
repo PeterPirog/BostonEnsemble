@@ -237,10 +237,10 @@ if __name__ == "__main__":
     # conf_keras['n_features'] = 66
 
     conf_keras['learning_rate'] = 0.1  # 0.1
-    conf_keras['hidden1'] = 40
-    conf_keras['hidden2'] = 40
+    conf_keras['hidden1'] = 136
+    conf_keras['hidden2'] = 27
     conf_keras['activation'] = 'elu'
-    conf_keras['dropout'] = 0.46
+    conf_keras['dropout'] = 0.25
     # fit method parameters
     conf_keras['x'] = None
     conf_keras['y'] = None
