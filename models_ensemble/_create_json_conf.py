@@ -267,3 +267,4 @@ if __name__ == "__main__":
 
     with open(conf_keras['json_file'], 'w') as fp:
         json.dump(conf_keras, fp)
+#0.012148303911089897 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 136, 'hidden2': 27, 'activation1': 'elu', 'dropout1': 0.25}
