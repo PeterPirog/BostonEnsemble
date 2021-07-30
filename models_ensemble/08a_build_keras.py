@@ -1,5 +1,6 @@
 # https://www.kaggle.com/hendraherviawan/regression-with-kerasregressor
 # https://www.adriangb.com/scikeras/stable/notebooks/Basic_Usage.html
+#https://stackoverflow.com/questions/37984304/how-to-save-a-scikit-learn-pipline-with-keras-regressor-inside-to-disk
 
 import pandas as pd
 import numpy as np
@@ -106,6 +107,9 @@ if __name__ == "__main__":
                                shuffle=conf_keras['shuffle'],
                                validation_batch_size=conf_keras['validation_batch_size'],
                                )
+    #https://scikeras.readthedocs.io/en/latest/generated/scikeras.wrappers.KerasRegressor.html
+    keras_model=KerasRegressor(build_fn=baseline_model,warm_start=True,epochs=1)
+
 
     keras_model.fit(X=X, y=y)
 
