@@ -1,7 +1,8 @@
 from tensorflow.keras.datasets import mnist
 from ray.tune.integration.keras import TuneReportCallback
 import numpy as np
-import tensorflow as tf  # tensorflow >= 2.5
+import tensorflow as tf
+from tensorflow.keras.regularizers import l1,l2,l1_l2
 import pandas as pd
 from pathlib import Path
 from sklearn.model_selection import train_test_split
@@ -50,15 +51,23 @@ def train_boston(config):
                               activation=config["activation1"])(x)
     x = tf.keras.layers.LayerNormalization()(x)
     x = tf.keras.layers.Dropout(config["dropout1"])(x)
-    # layer 2
+    # layer 2 - encoder
     x = tf.keras.layers.Dense(units=config["hidden2"], kernel_initializer='glorot_normal',
-                              activation=config["activation1"])(x)
+                              activation=config["activation1"],
+                              kernel_regularizer=l1_l2(l1=config["l1_value"],l2=config["l2_value"]))(x)
     x = tf.keras.layers.LayerNormalization()(x)
-    x = tf.keras.layers.Dropout(config["dropout1"])(x)
+
+    # x = tf.keras.layers.Dropout(config["dropout1"])(x)
     # layer 3
     x = tf.keras.layers.Dense(units=config["hidden3"], kernel_initializer='glorot_normal',
                               activation=config["activation1"])(x)
     x = tf.keras.layers.LayerNormalization()(x)
+    # layer 4
+    x = tf.keras.layers.Dense(units=config["hidden4"], kernel_initializer='glorot_normal',
+                              activation=config["activation1"])(x)
+    x = tf.keras.layers.LayerNormalization()(x)
+
+    # output layer
     x = tf.keras.layers.Dropout(config["dropout1"])(x)
 
     outputs = tf.keras.layers.Dense(units=1)(x)
@@ -120,7 +129,7 @@ if __name__ == "__main__":
     analysis = tune.run(
         train_boston,
         search_alg=HyperOptSearch(),
-        name="keras3L",
+        name="keras_enc2",
         scheduler=sched_asha,
         # Checkpoint settings
         keep_checkpoints_num=3,
@@ -150,17 +159,23 @@ if __name__ == "__main__":
             "learning_rate": tune.choice([0.1]),  # tune.loguniform(1e-5, 1e-2)
             # Layer 1 params
             "hidden1": tune.randint(5, 200),
-            "hidden2": tune.randint(5, 200),
+            "hidden2": tune.randint(5, 20),
             "hidden3": tune.randint(5, 200),
+            "hidden4": tune.randint(5, 200),
             "activation1": tune.choice(["elu"]),
             "dropout1": tune.quniform(0.01, 0.5, 0.01),  # tune.uniform(0.01, 0.15)
-            "noise_std": tune.uniform(0.001, 0.5)
+            "noise_std": tune.uniform(0.001, 0.5),
+            "l2_value": tune.loguniform(1e-5, 1e-1),
+            "l1_value": tune.loguniform(1e-5, 1e-1)
         }
 
     )
     print("Best hyperparameters found were: ", analysis.best_config)
-# tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/keras3L --bind_all --load_fast=false
+# tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/keras_enc2 --bind_all --load_fast=false
 """
-3 Layers
-val_loss=0.013416744768619537 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 117, 'hidden2': 164, 'hidden3': 54, 'activation1': 'elu', 'dropout1': 0.33, 'noise_std': 0.4582710220875051}
+
+l2 kernel+bias
+val_loss=0.015108032152056694 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 45, 'hidden2': 5, 'hidden3': 78, 'hidden4': 27, 'activation1': 'elu', 'dropout1': 0.26, 'noise_std': 0.10484684019567321, 'l2_value': 0.00026939177505762193}
+l2_l1 tylko kernel
+val_loss=0.01589714176952839 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 45, 'hidden2': 14, 'hidden3': 93, 'hidden4': 19, 'activation1': 'elu', 'dropout1': 0.27, 'noise_std': 0.415761057009093, 'l2_value': 0.07200438490395301, 'l1_value': 0.0004941306542847889}
 """

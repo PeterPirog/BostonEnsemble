@@ -10,7 +10,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense
 from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import KFold
+from sklearn.model_selection import KFold, RepeatedKFold
 from sklearn.preprocessing import StandardScaler
 from sklearn.pipeline import Pipeline
 
@@ -22,12 +22,12 @@ from ensemble_tools import FeatureByNameSelector, Validator
 from _create_json_conf import read_config_files
 
 # define base model
-def baseline_model(hidden1,hidden2,activation,dropout,lr):
+def baseline_model(hidden1,activation,number_inputs):
 	# create model
     epochs = 100000
     number_inputs=79
     activation='elu'
-    print('lr=',lr)
+
     #{'random_state': 117, 'batch': 64, 'learning_rate': 0.1, 'hidden1': 31, 'activation1': 'elu', 'dropout1': 0.28}
     # define model
     inputs = tf.keras.layers.Input(shape=number_inputs)

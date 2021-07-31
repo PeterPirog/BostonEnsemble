@@ -7,6 +7,8 @@ from pathlib import Path
 from sklearn.model_selection import train_test_split
 from ray.tune.schedulers import ASHAScheduler
 from ray.tune.suggest.hyperopt import HyperOptSearch
+from tensorflow.keras.regularizers import l2
+import json
 
 
 def train_boston(config):
@@ -32,8 +34,9 @@ def train_boston(config):
     # n_features=3
     y = df['SalePrice_log1']
 
-    # X = df[features_all[:config['n_features']]]
+    # X = df[features_all[:config['n_features']]] Id,SalePrice,SalePrice_log1
     X = df[features_all]
+    X = df.drop(['Id','SalePrice','SalePrice_log1'], axis=1).copy()
 
     X = X.to_numpy()
     y = y.to_numpy()
@@ -47,19 +50,9 @@ def train_boston(config):
     x = tf.keras.layers.GaussianNoise(stddev=config["noise_std"])(x)
     # layer 1
     x = tf.keras.layers.Dense(units=config["hidden1"], kernel_initializer='glorot_normal',
-                              activation=config["activation1"])(x)
-    x = tf.keras.layers.LayerNormalization()(x)
-    x = tf.keras.layers.Dropout(config["dropout1"])(x)
-    # layer 2
-    x = tf.keras.layers.Dense(units=config["hidden2"], kernel_initializer='glorot_normal',
-                              activation=config["activation1"])(x)
-    x = tf.keras.layers.LayerNormalization()(x)
-    x = tf.keras.layers.Dropout(config["dropout1"])(x)
-    # layer 3
-    x = tf.keras.layers.Dense(units=config["hidden3"], kernel_initializer='glorot_normal',
-                              activation=config["activation1"])(x)
-    x = tf.keras.layers.LayerNormalization()(x)
-    x = tf.keras.layers.Dropout(config["dropout1"])(x)
+                              activation=config["activation1"],
+                              kernel_regularizer=l2(l2=config["l2_value"]),
+                              use_bias=False)(x)
 
     outputs = tf.keras.layers.Dense(units=1)(x)
 
@@ -101,7 +94,7 @@ if __name__ == "__main__":
              num_gpus=1,
              include_dashboard=True,  # if you use docker use docker run -p 8265:8265 -p 6379:6379
              dashboard_host='0.0.0.0')
-
+    
     # ray.init(address='auto', _redis_password='5241590000000000')
     try:
         ray.init()
@@ -120,7 +113,7 @@ if __name__ == "__main__":
     analysis = tune.run(
         train_boston,
         search_alg=HyperOptSearch(),
-        name="keras3L",
+        name="keras_select",
         scheduler=sched_asha,
         # Checkpoint settings
         keep_checkpoints_num=3,
@@ -135,7 +128,7 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 5000
         },
-        num_samples=3000,  # number of samples from hyperparameter space
+        num_samples=1000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
         local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
@@ -147,20 +140,26 @@ if __name__ == "__main__":
         config={
             # training parameters
             "batch": tune.choice([64]),
-            "learning_rate": tune.choice([0.1]),  # tune.loguniform(1e-5, 1e-2)
+            "learning_rate": tune.choice([0.1]),
             # Layer 1 params
-            "hidden1": tune.randint(5, 200),
-            "hidden2": tune.randint(5, 200),
-            "hidden3": tune.randint(5, 200),
+            "hidden1": tune.randint(1, 200),
             "activation1": tune.choice(["elu"]),
-            "dropout1": tune.quniform(0.01, 0.5, 0.01),  # tune.uniform(0.01, 0.15)
-            "noise_std": tune.uniform(0.001, 0.5)
+            "noise_std": tune.uniform(0.001, 0.5),
+            "l2_value": tune.loguniform(1e-5, 1e-1),
         }
 
     )
     print("Best hyperparameters found were: ", analysis.best_config)
-# tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/keras3L --bind_all --load_fast=false
+
+
+
+
+
+# tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/keras_select --bind_all --load_fast=false
 """
-3 Layers
-val_loss=0.013416744768619537 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 117, 'hidden2': 164, 'hidden3': 54, 'activation1': 'elu', 'dropout1': 0.33, 'noise_std': 0.4582710220875051}
+with noise and bias
+val_loss=0.014095677062869072 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 5, 'activation1': 'elu', 'noise_std': 0.34762315075100414, 'l2_value': 2.1269345780548958e-05}
+val_loss=0.01846976950764656 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 2, 'activation1': 'elu', 'noise_std': 0.04558018730060088, 'l2_value': 0.0003760500113491962}
+with noise and  no bias
+{'batch': 64, 'learning_rate': 0.1, 'hidden1': 1, 'activation1': 'elu', 'noise_std': 0.13930154430030395, 'l2_value': 1.67355964893191e-05}
 """

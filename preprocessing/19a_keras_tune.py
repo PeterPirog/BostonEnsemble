@@ -7,7 +7,7 @@ from pathlib import Path
 from sklearn.model_selection import train_test_split
 from ray.tune.schedulers import ASHAScheduler
 from ray.tune.suggest.hyperopt import HyperOptSearch
-
+import json
 
 def train_boston(config):
     base_path = Path(__file__).parent.parent
@@ -37,14 +37,14 @@ def train_boston(config):
 
     X = X.to_numpy()
     y = y.to_numpy()
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True,random_state=None)
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True, random_state=None)
 
     epochs = 100000
     # define model
     inputs = tf.keras.layers.Input(shape=(X_train.shape[1]))
     x = tf.keras.layers.Flatten()(inputs)
     x = tf.keras.layers.LayerNormalization()(x)
-    x=tf.keras.layers.GaussianNoise(stddev=config["noise_std"])(x)
+    x = tf.keras.layers.GaussianNoise(stddev=config["noise_std"])(x)
     # layer 1
     x = tf.keras.layers.Dense(units=config["hidden1"], kernel_initializer='glorot_normal',
                               activation=config["activation1"])(x)
@@ -115,7 +115,7 @@ if __name__ == "__main__":
     analysis = tune.run(
         train_boston,
         search_alg=HyperOptSearch(),
-        name="keras",
+        name="keras2",
         scheduler=sched_asha,
         # Checkpoint settings
         keep_checkpoints_num=3,
@@ -130,7 +130,7 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 5000
         },
-        num_samples=1000,  # number of samples from hyperparameter space
+        num_samples=3000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
         local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
@@ -141,22 +141,26 @@ if __name__ == "__main__":
         },
         config={
             # training parameters
-            "batch": tune.choice([64]),
-            "learning_rate": tune.choice([0.1]),#tune.loguniform(1e-5, 1e-2)
+            "batch": tune.choice([128]),
+            "learning_rate": tune.choice([0.1]),  # tune.loguniform(1e-5, 1e-2)
             # Layer 1 params
             "hidden1": tune.randint(5, 200),
             "hidden2": tune.randint(5, 200),
             "activation1": tune.choice(["elu"]),
-            "dropout1": tune.quniform(0.01, 0.5, 0.01),#tune.uniform(0.01, 0.15)
-            "noise_std":tune.uniform(0.001, 0.3)
+            "dropout1": tune.quniform(0.01, 0.5, 0.01),  # tune.uniform(0.01, 0.15)
+            "noise_std": tune.uniform(0.001, 0.5)
         }
 
     )
     print("Best hyperparameters found were: ", analysis.best_config)
-# tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/keras --bind_all --load_fast=false
+
+
+
+# tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/keras2 --bind_all --load_fast=false
 """
 2 Layers
 val_loss=0.013803128153085709 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 40, 'activation1': 'elu', 'dropout1': 0.46}
 val_loss=0.016657643020153046 and parameters={'random_state': 117, 'batch': 64, 'learning_rate': 0.1, 'hidden1': 31, 'activation1': 'elu', 'dropout1': 0.28}
 0.012148303911089897 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 136, 'hidden2': 27, 'activation1': 'elu', 'dropout1': 0.25}
+val_loss=0.012398643419146538 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 144, 'hidden2': 20, 'activation1': 'elu', 'dropout1': 0.34, 'noise_std': 0.24288076882006787}
 """
