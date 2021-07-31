@@ -1,4 +1,4 @@
-from tensorflow.keras.datasets import mnist
+
 from ray.tune.integration.keras import TuneReportCallback
 import numpy as np
 import tensorflow as tf  # tensorflow >= 2.5
@@ -123,7 +123,7 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 5000
         },
-        num_samples=4,  # number of samples from hyperparameter space
+        num_samples=1000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
         local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
@@ -151,7 +151,7 @@ if __name__ == "__main__":
     # get feature labels
     df = pd.read_csv("/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/encoded_train_X_data.csv")
     X = df.drop(['Id', 'SalePrice', 'SalePrice_log1'], axis=1)
-    best_configuration['df_labels'] = X.columns
+    best_configuration['df_labels'] = list(X.columns)
 
     # Save best result to file
     with open('best_selection_net.json', 'w') as fp:
@@ -162,4 +162,6 @@ if __name__ == "__main__":
     results_df.to_excel('train_results.xlsx',
                         sheet_name='Results')
 
-# tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/keras_select --bind_all --load_fast=false
+# tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/keras_cv_select --bind_all --load_fast=false
+#{'_ubc': 0.15922711081631474, '_metric': 0.14415299029545392, 'time_this_iter_s': 51.48896765708923, 'done': True, 'timesteps_total': None, 'episodes_total': None, 'training_iteration': 1, 'experiment_id': '6992caa91a8f4a25a432b322a2d7790c', 'date': '2021-07-31_18-56-07', 'timestamp': 1627750567, 'time_total_s': 51.48896765708923, 'pid': 2981784, 'hostname': 'ai-server', 'node_ip': '192.168.1.47', 'config': {'batch_size': 64, 'hidden1': 34, 'activation': 'elu', 'noise_std': 0.37506113740525504, 'l2_value': 0.0011099477641101035}, 'time_since_restore': 51.48896765708923, 'timesteps_since_restore': 0, 'iterations_since_restore': 1, 'trial_id': '113ba5ea', 'experiment_tag': '643_activation=elu,batch_size=64,hidden1=34,l2_value=0.0011099,noise_std=0.37506'}, best hyperparameters found were:{'batch_size': 64, 'hidden1': 34, 'activation': 'elu', 'noise_std': 0.37506113740525504, 'l2_value': 0.0011099477641101035}
+
