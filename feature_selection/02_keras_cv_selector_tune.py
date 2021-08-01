@@ -7,7 +7,7 @@ from pathlib import Path
 from sklearn.model_selection import train_test_split
 from ray.tune.schedulers import ASHAScheduler
 from ray.tune.suggest.hyperopt import HyperOptSearch
-from tensorflow.keras.regularizers import l2
+from tensorflow.keras.regularizers import l2,l1_l2
 import json
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
@@ -15,7 +15,7 @@ from sklearn.model_selection import KFold, RepeatedKFold
 from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 
 
-def baseline_model(number_inputs, hidden1, activation, noise_std, l2_value):
+def baseline_model(number_inputs, hidden1, activation, noise_std,l1_value, l2_value,dropout):
     # define model
     inputs = tf.keras.layers.Input(shape=number_inputs)
     x = tf.keras.layers.Flatten()(inputs)
@@ -24,9 +24,9 @@ def baseline_model(number_inputs, hidden1, activation, noise_std, l2_value):
     # layer 1
     x = tf.keras.layers.Dense(units=hidden1, kernel_initializer='glorot_normal',
                               activation=activation,
-                              kernel_regularizer=l2(l2_value),
+                              kernel_regularizer=l1_l2(l1=l1_value,l2=l2_value),
                               use_bias=False)(x)
-
+    x = tf.keras.layers.Dropout(dropout)(x)
     outputs = tf.keras.layers.Dense(units=1)(x)
 
     model = tf.keras.Model(inputs=inputs, outputs=outputs, name="boston_model")
@@ -63,7 +63,9 @@ def train_boston(config):
                            hidden1=config['hidden1'],
                            noise_std=config['noise_std'],
                            activation=config['activation'],
+                           l1_value=config['l1_value'],
                            l2_value=config['l2_value'],
+                           dropout=config['dropout'],
                            # lr=config['learning_rate'],
                            ## fit parameters
                            batch_size=config['batch_size'],
@@ -112,7 +114,7 @@ if __name__ == "__main__":
         scheduler=sched_asha,
         # Checkpoint settings
         keep_checkpoints_num=3,
-        checkpoint_score_attr='min-_metric',  # 'min-val_loss'
+        checkpoint_score_attr='min-_ubc',  # 'min-val_loss'
         checkpoint_freq=3,
         checkpoint_at_end=False,
         verbose=3,
@@ -139,7 +141,9 @@ if __name__ == "__main__":
             "hidden1": tune.randint(1, 200),
             "activation": tune.choice(["elu"]),
             "noise_std": tune.uniform(0.001, 0.5),
+            "l1_value": tune.loguniform(1e-5, 1e-1),
             "l2_value": tune.loguniform(1e-5, 1e-1),
+            "dropout": tune.uniform(0.001, 0.5)
         }
 
     )
