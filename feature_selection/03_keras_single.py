@@ -95,11 +95,14 @@ if __name__ == "__main__":
               use_multiprocessing=True)
 
     #Model.get_layer(name=None, index=None)
-    w1=model.get_layer(name='dense_layer').get_weights()[0]
-    w2=model.get_layer(name='output_layer').get_weights()[0]
+    c=model.get_layer(name='dense_layer').get_weights()[0]
+    c=np.array(c)
 
-    print(f'w1={w1}')
-    print(f'w2={w2}')
+    w=model.get_layer(name='output_layer').get_weights()[0]
+    w=np.array(w)
+
+    print(f'w1={c}, {c.shape}')
+    print(f'w2={w}, {w.shape}')
     """
     for layerNum, layer in enumerate(model.layers):
         weights=layer.get_weights()

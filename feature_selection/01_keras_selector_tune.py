@@ -7,7 +7,7 @@ from pathlib import Path
 from sklearn.model_selection import train_test_split
 from ray.tune.schedulers import ASHAScheduler
 from ray.tune.suggest.hyperopt import HyperOptSearch
-from tensorflow.keras.regularizers import l2
+from tensorflow.keras.regularizers import l2, l1_l2
 import json
 
 
@@ -51,8 +51,9 @@ def train_boston(config):
     # layer 1
     x = tf.keras.layers.Dense(units=config["hidden1"], kernel_initializer='glorot_normal',
                               activation=config["activation1"],
-                              kernel_regularizer=l2(l2=config["l2_value"]),
+                              kernel_regularizer=l1_l2(l1=config["l1_value"],l2=config["l2_value"]),
                               use_bias=False)(x)
+    x = tf.keras.layers.Dropout(config["dropout"])(x)
 
     outputs = tf.keras.layers.Dense(units=1)(x)
 
@@ -128,7 +129,7 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 5000
         },
-        num_samples=1000,  # number of samples from hyperparameter space
+        num_samples=3000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
         local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
@@ -145,7 +146,9 @@ if __name__ == "__main__":
             "hidden1": tune.randint(1, 200),
             "activation1": tune.choice(["elu"]),
             "noise_std": tune.uniform(0.001, 0.5),
+            "l1_value": tune.loguniform(1e-5, 1e-1),
             "l2_value": tune.loguniform(1e-5, 1e-1),
+            "dropout": tune.uniform(0.001, 0.5)
         }
 
     )
