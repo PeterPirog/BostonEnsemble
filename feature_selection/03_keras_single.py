@@ -6,7 +6,7 @@ from pathlib import Path
 from sklearn.model_selection import train_test_split
 from ray.tune.schedulers import ASHAScheduler
 from ray.tune.suggest.hyperopt import HyperOptSearch
-from tensorflow.keras.regularizers import l2
+from tensorflow.keras.regularizers import l2, l1_l2
 import json
 from sklearn.model_selection import KFold
 from sklearn.model_selection import cross_val_score
@@ -14,26 +14,26 @@ from sklearn.model_selection import KFold, RepeatedKFold
 from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 
 
-def baseline_model(number_inputs, hidden1, activation, noise_std, l2_value):
+def baseline_model(number_inputs, hidden1, activation, noise_std, l1_value, l2_value, dropout):
     # define model
-    inputs = tf.keras.layers.Input(shape=number_inputs, name='input_layer')
-    x = tf.keras.layers.Flatten(name='flatten_layer')(inputs)
-    x = tf.keras.layers.LayerNormalization(name='normalization_layer')(x)
-    x = tf.keras.layers.GaussianNoise(stddev=noise_std, name='nosie_layer')(x)
+    inputs = tf.keras.layers.Input(shape=number_inputs)
+    x = tf.keras.layers.Flatten()(inputs)
+    x = tf.keras.layers.LayerNormalization()(x)
+    x = tf.keras.layers.GaussianNoise(stddev=noise_std)(x)
     # layer 1
     x = tf.keras.layers.Dense(units=hidden1, kernel_initializer='glorot_normal',
                               activation=activation,
-                              kernel_regularizer=l2(l2_value),
-                              use_bias=False,
-                              name='dense_layer')(x)
-    outputs = tf.keras.layers.Dense(units=1, name='output_layer')(x)
+                              kernel_regularizer=l1_l2(l1=l1_value, l2=l2_value),
+                              use_bias=False, name='dense_layer')(x)
+    x = tf.keras.layers.Dropout(dropout)(x)
+    outputs = tf.keras.layers.Dense(units=1,name='output_layer')(x)
 
     model = tf.keras.Model(inputs=inputs, outputs=outputs, name="boston_model")
 
     model.compile(
-        loss='mse',  # mean_squared_logarithmic_error "mse"
+        loss='mean_squared_error',  # mean_squared_logarithmic_error "mse"
         optimizer=tf.keras.optimizers.Adam(learning_rate=0.1),
-        metrics=[tf.keras.metrics.RootMeanSquaredError()])  #'mean_squared_error'
+        metrics='mean_squared_error')  # accuracy mean_squared_logarithmic_error
     return model
 
 
@@ -59,7 +59,7 @@ if __name__ == "__main__":
                                          patience=15),
         # save best result
         tf.keras.callbacks.ModelCheckpoint(
-            filepath='./',
+            filepath='model_1L.h5',
             save_weights_only=False,
             monitor='loss',
             mode='min',
@@ -78,10 +78,12 @@ if __name__ == "__main__":
     ]
 
     model = baseline_model(number_inputs=80,
-                           hidden1=34,
+                           hidden1=20, #20
                            activation='elu',
-                           noise_std=0.37506113740525504,
-                           l2_value=0.0011099477641101035)
+                           noise_std=0.020298941092507204,
+                           l1_value=3.543298823184669e-05,
+                           l2_value=5.945058708937871e-05,
+                           dropout=0.1309933349281991)
 
     model.summary()
 
@@ -95,10 +97,12 @@ if __name__ == "__main__":
               use_multiprocessing=True)
 
     #Model.get_layer(name=None, index=None)
-    c=model.get_layer(name='dense_layer').get_weights()[0]
+    model.save('.\model_1L.h5')
+    model2 = tf.keras.models.load_model('model_1L.h5')
+    c=model2.get_layer(name='dense_layer').get_weights()[0]
     c=np.array(c)
 
-    w=model.get_layer(name='output_layer').get_weights()[0]
+    w=model2.get_layer(name='output_layer').get_weights()[0]
     w=np.array(w)
 
     print(f'w1={c}, {c.shape}')
