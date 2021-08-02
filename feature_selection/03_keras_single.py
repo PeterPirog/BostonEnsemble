@@ -1,17 +1,8 @@
-from ray.tune.integration.keras import TuneReportCallback
-import numpy as np
 import tensorflow as tf  # tensorflow >= 2.5
 import pandas as pd
 from pathlib import Path
-from sklearn.model_selection import train_test_split
-from ray.tune.schedulers import ASHAScheduler
-from ray.tune.suggest.hyperopt import HyperOptSearch
 from tensorflow.keras.regularizers import l2, l1_l2
-import json
-from sklearn.model_selection import KFold
-from sklearn.model_selection import cross_val_score
-from sklearn.model_selection import KFold, RepeatedKFold
-from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
+
 
 
 def baseline_model(number_inputs, hidden1, activation, noise_std, l1_value, l2_value, dropout):
@@ -31,9 +22,9 @@ def baseline_model(number_inputs, hidden1, activation, noise_std, l1_value, l2_v
     model = tf.keras.Model(inputs=inputs, outputs=outputs, name="boston_model")
 
     model.compile(
-        loss='mean_squared_error',  # mean_squared_logarithmic_error "mse"
+        loss='mse',  # mean_squared_logarithmic_error "mse" 'mean_squared_error'
         optimizer=tf.keras.optimizers.Adam(learning_rate=0.1),
-        metrics='mean_squared_error')  # accuracy mean_squared_logarithmic_error
+        metrics='mean_squared_error')
     return model
 
 
@@ -95,53 +86,9 @@ if __name__ == "__main__":
               callbacks=callbacks_list,
               workers=1,
               use_multiprocessing=True)
-
-    #Model.get_layer(name=None, index=None)
     model.save('.\model_1L.h5')
     model2 = tf.keras.models.load_model('model_1L.h5')
-    c=model2.get_layer(name='dense_layer').get_weights()[0]
-    c=np.array(c)
+    model2.summary()
 
-    w=model2.get_layer(name='output_layer').get_weights()[0]
-    w=np.array(w)
-
-    print(f'w1={c}, {c.shape}')
-    print(f'w2={w}, {w.shape}')
-    """
-    for layerNum, layer in enumerate(model.layers):
-        weights=layer.get_weights()
-        #biases = layer.get_weights()[1]
-        print(f'layerNum ={layerNum}_{layer.name},weights={weights}, len= {len(weights)}')
-        #print(f'biases={biases}')
-
-
-    model = KerasRegressor(build_fn=baseline_model,
-                           ## custom parameters
-                           number_inputs=80,
-                           hidden1=34,
-                           noise_std=0.37506113740525504,
-                           activation=config['activation'],
-                           l2_value=config['l2_value'],
-                           # lr=config['learning_rate'],
-                           ## fit parameters
-                           batch_size=config['batch_size'],
-                           epochs=100000,
-                           verbose=0,
-                           # verbose=config['verbose'],
-                           callbacks=callbacks_list
-                           )
-
-    cv = RepeatedKFold(n_splits=10, n_repeats=1, random_state=None)
-
-    # evaluate_model
-    scores = cross_val_score(model, X, y,
-                             scoring='neg_root_mean_squared_error',  # 'neg_mean_absolute_error' make_scorer(rmsle)
-                             cv=cv,
-                             n_jobs=-1)
-
-    # force scores to be positive
-    scores = abs(scores)
-
-    # print('Mean RMSLE: %.4f (%.4f)' % (scores.mean(), scores.std()))
 # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/tensorboard --bind_all --load_fast=false
-"""
+

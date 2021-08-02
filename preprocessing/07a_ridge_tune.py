@@ -8,6 +8,7 @@ import pandas as pd
 from pathlib import Path
 from sklearn.model_selection import RepeatedKFold, cross_val_score
 from sklearn.linear_model import Ridge
+import json
 
 
 def train_boston(config):
@@ -29,12 +30,16 @@ def train_boston(config):
                     '_HouseStyle_2', '_Exterior_HdBoard', '_MSSubClass_2', '_QuarterSold', '_ExterCond',
                     '_Neighborhood_2', '_YrSold', '_BsmtFinSF2', '_BldgType_3', '_Exterior_Plywood', '_LandContour_2',
                     '_MSZoning_3', '_LotConfig_3']
+    features_all=['_HouseStyle_2', '_HouseStyle_3', '_GrLivArea', '_BuildingAge', '_HouseStyle_1', '_OverallQual', '_Neighborhood_2', '_HouseStyle_4', '_Neighborhood_9', '_TotalBsmtSF', '_OverallCond', '_KitchenQual', '_Electrical', '_MSZoning_3', '_GarageArea', '_BldgType_2', '_SaleCondition_Abnorml', '_LotArea', '_ScreenPorch', '_MSSubClass_1', '_BsmtQual', '_Functional', '_Neighborhood_5', '_MSSubClass_3', '_FireplaceQu', '_RoofStyle_1', '_BsmtExposure', '_GarageQual', '_MSZoning_1', '_BsmtFullBath', '_WoodDeckSF', '_YearRemodAdd', '_FullBath', '_BsmtFinSF1', '_BsmtUnfSF', '_HalfBath', '_SaleType_WD', '_CentralAir', '_LotConfig_4', '_LotFrontage', '_Neighborhood_8', '_Foundation_2', '_OpenPorchSF', '_GarageType_Attchd', '_BldgType_3', '_HeatingQC', '_MasVnrType_Stone', '_Exterior_HdBoard', '_EnclosedPorch', '_YrSold', '_GarageFinish', '_Neighborhood_1', '_BsmtFinType1', '_PavedDrive', '_Exterior_VinylSd', '_Alley', '_LotConfig_1', '_MSSubClass_2', '_Foundation_3', '_ExterQual', '_MasVnrArea', '_BldgType_1', '_Exterior_Plywood', '_BsmtFinSF2', '_SaleCondition_Normal', '_GarageType_BuiltIn', '_BsmtCond', '_SaleCondition_Partial', '_BedroomAbvGr', '_Exterior_MetalSd', '_MasVnrType_BrkFace', '_LandContour_2', '_Foundation_1', '_LotShape', '_Exterior_WdSdng', '_ExterCond', '_GarageType_Detchd', '_LotConfig_3', '_Fence', '_QuarterSold']
+
+
     n_features = len(features_all)
     # n_features=3
     y = df['SalePrice_log1']
 
     X = df[features_all[:config['n_features']]]
-    model = Ridge(config['alpha'],max_iter=config['max_iter'])
+    #model = Ridge(config['alpha'],max_iter=config['max_iter'])
+    model = Ridge(config['alpha'])
 
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
     # evaluate_model
@@ -78,7 +83,7 @@ if __name__ == "__main__":
         keep_checkpoints_num=3,
         checkpoint_freq=3,
         checkpoint_at_end=True,
-        verbose=2,
+        verbose=3,
         # Optimalization
         # metric="val_rmsle",  # mean_accuracy
         mode="min",  # max
@@ -97,12 +102,12 @@ if __name__ == "__main__":
         },
         config={
             "alpha": tune.loguniform(1e-5, 100),
-            "max_iter": tune.qrandint(500, 10000, 500),
+            #"max_iter": tune.qrandint(500, 10000, 500),
             "n_features": tune.randint(1, 79)
         }
 
     )
-    print("Best hyperparameters found were: ", analysis.best_config)
+    print("Best result:",analysis.best_result,"Best hyperparameters found were: ", analysis.best_config)
     # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/ridge --bind_all --load_fast=false
 
 
