@@ -174,5 +174,5 @@ if __name__ == "__main__":
 https://www.tensorflow.org/install/source
 https://www.dell.com/support/kbdoc/pl-pl/000113631/how-to-configure-docker-and-deploy-tensorflow-containers-on-ubuntu-guest-operating-system?lang=en
 This TensorFlow binary is optimized with oneAPI Deep Neural Network Library (oneDNN) to use the following CPU instructions in performance-critical operations:  FMA
-
+bazel build --copt=-march=native -c opt --config=mkl --config=v2 //tensorflow/tools/pip_package:build_pip_package
 """
