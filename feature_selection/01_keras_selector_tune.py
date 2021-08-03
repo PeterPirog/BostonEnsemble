@@ -144,7 +144,7 @@ if __name__ == "__main__":
             "learning_rate": tune.choice([0.1]),
             # Layer 1 params
             "hidden1": tune.randint(1, 200),
-            "activation1": tune.choice(["elu"]),
+            "activation1": tune.choice(["linear"]), #elu
             "noise_std": tune.uniform(0.001, 0.5),
             "l1_value": tune.loguniform(1e-5, 1e-1),
             "l2_value": tune.loguniform(1e-5, 1e-1),
