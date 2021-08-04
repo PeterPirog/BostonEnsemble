@@ -4,3 +4,46 @@ Test:
 Gaussian process regressor
 https://scikit-learn.org/stable/modules/generated/sklearn.gaussian_process.GaussianProcessRegressor.html#sklearn.gaussian_process.GaussianProcessRegressor
 
+TF compilation
+https://software.intel.com/content/www/us/en/develop/articles/intel-optimization-for-tensorflow-installation-guide.html
+https://software.intel.com/content/www/us/en/develop/articles/maximize-tensorflow-performance-on-cpu-considerations-and-recommendations-for-inference.html
+
+Linux build
+Building TensorFlow from source is not recommended. However, if instructions provided above do not work due to unsupported ISA, you can always build from source.
+
+Building TensorFlow from source code requires Bazel installation, refer to the instructions here, Installing Bazel.
+
+Installation instructions:
+
+Ensure numpy, keras-applications, keras-preprocessing, pip, six, wheel, mock packages are installed in the Python environment where TensorFlow is being built and installed.
+Clone the TensorFlow source code and checkout a branch of your preference
+
+##      git clone https://github.com/tensorflow/tensorflow
+##      cd tensorflow
+##      git checkout v2.6.0-rc1
+
+Run "./configure" from the TensorFlow source directory
+Execute the following commands to create a pip package that can be used to install the optimized TensorFlow build.
+PATH can be changed to point to a specific version of GCC compiler:
+export PATH=/PATH//bin:$PATH
+
+LD_LIBRARY_PATH can also be to new:
+export LD_LIBRARY_PATH=/PATH//lib64:$LD_LIBRARY_PATH
+
+Set the compiler flags support by the GCC on your machine to build TensorFlow with oneDNN.
+##      bazel build --config=mkl -c opt --copt=-march=native //tensorflow/tools/pip_package:build_pip_package
+
+
+If you would like to build the binary against certain hardware, ensure appropriate "march" and "mtune" flags are set. Refer the gcc online docs to know the flags supported by your GCC version.
+bazel build --config=mkl --cxxopt=-D_GLIBCXX_USE_CXX11_ABI=0 --copt=-march=sandybridge --copt=-mtune=ivybridge --copt=-O3 //tensorflow/tools/pip_package:build_pip_package
+
+
+
+Alternatively, if you would like to build the binary against certain instruction sets, set appropriate "Instruction sets" flags:
+bazel build --config=mkl -c opt --copt=-mavx --copt=-mavx2 --copt=-mfma --copt=-mavx512f --copt=-mavx512pf --copt=-mavx512cd --copt=-mavx512er //tensorflow/tools/pip_package:build_pip_package
+
+Flags set above will add AVX, AVX2 and AVX512 instructions which will result in "illegal instruction" errors when you use older CPUs. If you want to build on older CPUs, set the instruction flags accordingly.
+
+Install the optimized TensorFlow wheel
+bazel-bin/tensorflow/tools/pip_package/build_pip_package ~/path_to_save_wheel
+pip install --upgrade --user ~/path_to_save_wheel/

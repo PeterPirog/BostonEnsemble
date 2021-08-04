@@ -141,8 +141,8 @@ if __name__ == "__main__":
             "hidden1": tune.randint(1, 200),
             "activation": tune.choice(["linear"]),#"elu"
             "noise_std": tune.uniform(0.001, 0.5),
-            "l1_value": tune.loguniform(1e-5, 1e-1),
-            "l2_value": tune.loguniform(1e-5, 1e-1),
+            "l1_value": tune.loguniform(1e-5, 100),
+            "l2_value": tune.loguniform(1e-5, 100),
             "dropout": tune.uniform(0.001, 0.5)
         }
 
@@ -169,6 +169,8 @@ if __name__ == "__main__":
 # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/keras_cv_select --bind_all --load_fast=false
 #{'_ubc': 0.15922711081631474, '_metric': 0.14415299029545392, 'time_this_iter_s': 51.48896765708923, 'done': True, 'timesteps_total': None, 'episodes_total': None, 'training_iteration': 1, 'experiment_id': '6992caa91a8f4a25a432b322a2d7790c', 'date': '2021-07-31_18-56-07', 'timestamp': 1627750567, 'time_total_s': 51.48896765708923, 'pid': 2981784, 'hostname': 'ai-server', 'node_ip': '192.168.1.47', 'config': {'batch_size': 64, 'hidden1': 34, 'activation': 'elu', 'noise_std': 0.37506113740525504, 'l2_value': 0.0011099477641101035}, 'time_since_restore': 51.48896765708923, 'timesteps_since_restore': 0, 'iterations_since_restore': 1, 'trial_id': '113ba5ea', 'experiment_tag': '643_activation=elu,batch_size=64,hidden1=34,l2_value=0.0011099,noise_std=0.37506'}, best hyperparameters found were:{'batch_size': 64, 'hidden1': 34, 'activation': 'elu', 'noise_std': 0.37506113740525504, 'l2_value': 0.0011099477641101035}
 #_ubc=0.1538731554664114 and parameters={'batch_size': 64, 'hidden1': 20, 'activation': 'elu', 'noise_std': 0.020298941092507204, 'l1_value': 3.543298823184669e-05, 'l2_value': 5.945058708937871e-05, 'dropout': 0.1309933349281991}
+
+#linear Result is: {'_ubc': 0.15601026064985163, '_metric': 0.1440801301149274, 'time_this_iter_s': 180.4915156364441, 'done': True, 'timesteps_total': None, 'episodes_total': None, 'training_iteration': 1, 'experiment_id': '10950ddcf35642f9be0d5d8ccc4acfaa', 'date': '2021-08-04_00-39-58', 'timestamp': 1628030398, 'time_total_s': 180.4915156364441, 'pid': 3459, 'hostname': 'ai-server', 'node_ip': '192.168.1.47', 'config': {'batch_size': 64, 'hidden1': 28, 'activation': 'linear', 'noise_std': 0.019073069473677297, 'l1_value': 4.141130579284094e-05, 'l2_value': 1.8290207683911284e-05, 'dropout': 0.08325984398279247}, 'time_since_restore': 180.4915156364441, 'timesteps_since_restore': 0, 'iterations_since_restore': 1, 'trial_id': '49da9f54', 'experiment_tag': '668_activation=linear,batch_size=64,dropout=0.08326,hidden1=28,l1_value=4.1411e-05,l2_value=1.829e-05,noise_std=0.019073'}, best hyperparameters found were:{'batch_size': 64, 'hidden1': 28, 'activation': 'linear', 'noise_std': 0.019073069473677297, 'l1_value': 4.141130579284094e-05, 'l2_value': 1.8290207683911284e-05, 'dropout': 0.08325984398279247}
 
 """
 https://www.tensorflow.org/install/source
