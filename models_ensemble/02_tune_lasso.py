@@ -85,7 +85,7 @@ if __name__ == "__main__":
         },
         config={
             "alpha": tune.loguniform(1e-5, 100),
-            "n_features": tune.randint(1, 79)
+            "n_features": tune.randint(1, 80)
         }
 
     )

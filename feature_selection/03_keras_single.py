@@ -69,12 +69,12 @@ if __name__ == "__main__":
     ]
 
     model = baseline_model(number_inputs=80,
-                           hidden1=20, #20
-                           activation='elu',
-                           noise_std=0.020298941092507204,
-                           l1_value=3.543298823184669e-05,
-                           l2_value=5.945058708937871e-05,
-                           dropout=0.1309933349281991)
+                           hidden1=28, #20
+                           activation='linear',
+                           noise_std=0.019073069473677297,
+                           l1_value=4.141130579284094e-05,
+                           l2_value=1.8290207683911284e-05,
+                           dropout=0.08325984398279247)
 
     model.summary()
 
