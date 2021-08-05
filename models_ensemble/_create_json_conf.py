@@ -119,15 +119,15 @@ if __name__ == "__main__":
 
 #_ubc=0.16018423333335852 and parameters={'n_features': 65, 'kernel': 'rbf', 'degree': 3, 'gamma': 'scale', 'C': 0.8300336256308384, 'epsilon': 0.06521901988723335}
     conf_svr['all_features'] = conf_global['all_features']
-    conf_svr['n_features'] = 77
+    conf_svr['n_features'] = 65
 
     conf_svr['kernel'] = 'rbf'  # ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’
     conf_svr['degree'] = 3
     conf_svr['gamma'] = 'scale'  # ‘scale’, ‘auto’
     conf_svr['coef0'] = 0.0
     conf_svr['tol'] = 0.001
-    conf_svr['C'] = 0.7832573311079015
-    conf_svr['epsilon'] = 0.04825896120073174
+    conf_svr['C'] = 0.8300336256308384
+    conf_svr['epsilon'] = 0.06521901988723335
     conf_svr['shrinking'] = True
     conf_svr['cache_size'] = 200
     conf_svr['verbose'] = False
