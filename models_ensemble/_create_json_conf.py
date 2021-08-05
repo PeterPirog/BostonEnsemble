@@ -128,7 +128,7 @@ def create_elastic_conf(conf_global=None, filename='conf_elastic.json', conf_ela
     return conf_elastic
 
 
-def create_svr_conf(conf_global=None, filename='svr.json', conf_svr={}):
+def create_svr_conf(conf_global=None, filename='conf_svr.json', conf_svr={}):
     # Make SVR Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html?highlight=svr#sklearn.svm.SVR
     try:
@@ -157,8 +157,34 @@ def create_svr_conf(conf_global=None, filename='svr.json', conf_svr={}):
     return conf_svr
 
 
+def create_neighbors_conf(conf_global=None, filename='conf_kneighbors.json',conf_kneighbors={}):
+    # Make KNeighbors Configuration
+    # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html?highlight=svr#sklearn.svm.SVR
+    try:
+        conf_kneighbors['all_features'] = conf_global['all_features']
+    except:
+        pass
+    conf_kneighbors['all_features'] = conf_global['all_features']  # TUNE
+    conf_kneighbors['n_features'] = 65  # TUNE
+
+    conf_kneighbors['n_neighbors'] = 7  # TUNE
+    conf_kneighbors['weights'] = 'distance'  # TUNE
+    conf_kneighbors['algorithm'] = 'auto'  # TUNE
+    conf_kneighbors['leaf_size'] = 83  # TUNE
+    conf_kneighbors['p'] = 1
+    conf_kneighbors['metric'] = 'minkowski'
+    conf_kneighbors['metric_params'] = None
+    conf_kneighbors['n_jobs'] = -1
+
+    conf_kneighbors['output_file'] = 'model_kneighbors.joblib'
+    conf_kneighbors['json_file'] = filename
+
+    with open(filename, 'w') as fp:
+        json.dump(conf_kneighbors, fp)
+    return conf_kneighbors
+
+
 if __name__ == "__main__":
-    conf_kneighbors = {}  # dict with configuration for kneighbors model
     conf_bridge = {}  # dict with configuration for  bayesian ridge model
     conf_forest = {}  # dict with configuration for  random forest model
     conf_keras = {}  # dict with configuration for  keras dense 2 layer model
@@ -175,29 +201,11 @@ if __name__ == "__main__":
     # 4 create elastic net configuration and save in conf_elastic.json file
     conf_elastic = create_elastic_conf(conf_global=conf_global, filename='conf_elastic.json')
 
-    # 4 create elastic net configuration and save in conf_elastic.json file
+    # 5 create svr configuration and save in conf_elastic.json file
     conf_svr = create_svr_conf(conf_global=conf_global, filename='conf_svr.json')
 
-    # Make KNeighbors Configuration
-    # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html?highlight=svr#sklearn.svm.SVR
-
-    conf_kneighbors['all_features'] = conf_global['all_features']
-    conf_kneighbors['n_features'] = 65
-
-    conf_kneighbors['n_neighbors'] = 7
-    conf_kneighbors['weights'] = 'distance'
-    conf_kneighbors['algorithm'] = 'auto'
-    conf_kneighbors['leaf_size'] = 83
-    conf_kneighbors['p'] = 1
-    conf_kneighbors['metric'] = 'minkowski'
-    conf_kneighbors['metric_params'] = None
-    conf_kneighbors['n_jobs'] = -1
-
-    conf_kneighbors['output_file'] = 'model_kneighbors.joblib'
-    conf_kneighbors['json_file'] = 'conf_kneighbors.json'
-
-    with open(conf_kneighbors['json_file'], 'w') as fp:
-        json.dump(conf_kneighbors, fp)
+    # 6 create k-neighbors configuration and save in conf_elastic.json file
+    conf_kneighbors = create_neighbors_conf(conf_global=conf_global, filename='conf_kneighbors.json')
 
     # Make Bayesian Ridge Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html?highlight=ridge#sklearn.linear_model.Ridge
