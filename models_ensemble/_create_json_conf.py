@@ -52,7 +52,7 @@ def create_ridge_conf(conf_global=None, filename='conf_ridge.json', conf_ridge={
     except:
         pass
     conf_ridge['n_features'] = 50  # TUNED
-    conf_ridge['alpha'] = 0.42761871907638627  # TUNED
+    conf_ridge['alpha'] = 0.424205265420875  # TUNED
     conf_ridge['fit_intercept'] = True
     conf_ridge['normalize'] = False
     conf_ridge['copy_X'] = True
@@ -61,7 +61,7 @@ def create_ridge_conf(conf_global=None, filename='conf_ridge.json', conf_ridge={
     conf_ridge['solver'] = 'auto'
     conf_ridge['random_state'] = None
 
-    # conf_ridge['output_file'] = 'model_ridge.joblib'
+    conf_ridge['output_file'] = 'model_ridge.joblib'
     conf_ridge['json_file'] = filename
 
     with open(filename, 'w') as fp:

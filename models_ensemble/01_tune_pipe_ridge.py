@@ -51,20 +51,15 @@ def train_boston(config):
         ('model', model_ridge),
     ])
 
-
-
-
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
     # evaluate_model
-
     scores = cross_val_score(pipe_ridge, X, y,
                              scoring='neg_root_mean_squared_error',  # 'neg_mean_absolute_error' make_scorer(rmsle)
                              cv=cv,
                              n_jobs=-1)
     # force scores to be positive
     scores = abs(scores)
-
-    ray.tune.report(_metric=scores.mean(),_ubc=scores.mean() + 2 * scores.std())
+    ray.tune.report(_metric=scores.mean(),_std=scores.std(),_ubc=scores.mean() + 2 * scores.std())
 
 
 if __name__ == "__main__":
@@ -100,7 +95,7 @@ if __name__ == "__main__":
             # "mean_accuracy": 0.99,
             "training_iteration": 100
         },
-        num_samples=30,  # number of samples from hyperparameter space
+        num_samples=3000,  # number of samples from hyperparameter space
         reuse_actors=True,
         # Data and resources
         local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
@@ -118,5 +113,6 @@ if __name__ == "__main__":
     print("Best result:",analysis.best_result)
     print("Best hyperparameters found were: ", analysis.best_config)
     # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/ridge --bind_all --load_fast=false
-
+    #'_std': 0.014156917636511966, '_ubc': 0.16426060089180344, '_metric': 0.1359467656187795
+    # {'alpha': 0.424205265420875, 'n_features': 50}
 
