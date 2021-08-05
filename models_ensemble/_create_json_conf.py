@@ -93,10 +93,10 @@ if __name__ == "__main__":
     # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html?highlight=elastic#sklearn.linear_model.ElasticNet
 
     conf_elastic['all_features'] = conf_global['all_features']
-    conf_elastic['n_features'] = 46
+    conf_elastic['n_features'] = 50
 
-    conf_elastic['alpha'] = 9.06030772660738e-05
-    conf_elastic['l1_ratio'] = 0.7954307844274405
+    conf_elastic['alpha'] = 0.00010221867853787662
+    conf_elastic['l1_ratio'] = 0.9784366976103005
     conf_elastic['fit_intercept'] = True
     conf_elastic['normalize'] = False
     conf_elastic['precompute'] = False
@@ -117,6 +117,7 @@ if __name__ == "__main__":
     # Make SVR Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html?highlight=svr#sklearn.svm.SVR
 
+#_ubc=0.16018423333335852 and parameters={'n_features': 65, 'kernel': 'rbf', 'degree': 3, 'gamma': 'scale', 'C': 0.8300336256308384, 'epsilon': 0.06521901988723335}
     conf_svr['all_features'] = conf_global['all_features']
     conf_svr['n_features'] = 77
 

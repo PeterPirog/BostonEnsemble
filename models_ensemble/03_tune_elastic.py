@@ -92,5 +92,5 @@ if __name__ == "__main__":
     )
     print("Best result:",analysis.best_result,"Best hyperparameters found were: ", analysis.best_config)
     # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/elastic --bind_all --load_fast=false
-
+    #_ubc=0.16422055974545008 and parameters={'alpha': 0.00010221867853787662, 'l1_ratio': 0.9784366976103005, 'n_features': 50}
 

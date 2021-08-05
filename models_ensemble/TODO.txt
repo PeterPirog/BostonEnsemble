@@ -18,7 +18,7 @@ Installation instructions:
 Ensure numpy, keras-applications, keras-preprocessing, pip, six, wheel, mock packages are installed in the Python environment where TensorFlow is being built and installed.
 Clone the TensorFlow source code and checkout a branch of your preference
 
-##      git clone https://github.com/tensorflow/tensorflow
+##      git clone --recurse-submodules https://github.com/tensorflow/tensorflow
 ##      cd tensorflow
 ##      git checkout v2.6.0-rc1
 
@@ -33,6 +33,7 @@ export LD_LIBRARY_PATH=/PATH//lib64:$LD_LIBRARY_PATH
 Set the compiler flags support by the GCC on your machine to build TensorFlow with oneDNN.
 ##      bazel build --config=mkl -c opt --copt=-march=native //tensorflow/tools/pip_package:build_pip_package
 
+#woith cuda bazel build --config=cuda  //tensorflow/tools/pip_package:build_pip_package
 
 If you would like to build the binary against certain hardware, ensure appropriate "march" and "mtune" flags are set. Refer the gcc online docs to know the flags supported by your GCC version.
 bazel build --config=mkl --cxxopt=-D_GLIBCXX_USE_CXX11_ABI=0 --copt=-march=sandybridge --copt=-mtune=ivybridge --copt=-O3 //tensorflow/tools/pip_package:build_pip_package
