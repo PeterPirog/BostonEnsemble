@@ -1,32 +1,28 @@
 import json
-from pathlib import Path
 
 
-def read_config_files(configuration_name='conf_global'):
-    base_path = Path(__file__).parent.parent
-    file = str(base_path) + '/models_ensemble/' + configuration_name + '.json'
+def create_global_conf(filename='conf_global.json', conf_global={}):
+    # create global configuration and save in conf_global.json file
+    conf_global['all_features'] = ['_BldgType_2', '_BldgType_1', '_BldgType_3', '_GrLivArea', '_MSSubClass_3',
+                                   '_OverallQual', '_BuildingAge', '_TotalBsmtSF', '_Functional', '_CentralAir',
+                                   '_Electrical', '_SaleCondition_Abnorml', '_RoofStyle_1', '_LotArea', '_GarageArea',
+                                   '_KitchenQual', '_OverallCond', '_Neighborhood_9', '_SaleType_WD', '_ScreenPorch',
+                                   '_BsmtExposure', '_ExterQual', '_BsmtUnfSF', '_Foundation_2', '_HouseStyle_2',
+                                   '_HouseStyle_3', '_LotConfig_4', '_GarageType_BuiltIn', '_FullBath',
+                                   '_Neighborhood_1', '_FireplaceQu', '_BsmtQual', '_SaleCondition_Normal',
+                                   '_BsmtFinType1', '_PavedDrive', '_Foundation_3', '_MSZoning_1', '_Neighborhood_5',
+                                   '_HeatingQC', '_YrSold', '_HalfBath', '_YearRemodAdd', '_GarageFinish',
+                                   '_HouseStyle_1', '_BsmtFinSF2', '_WoodDeckSF', '_Exterior_VinylSd', '_MSSubClass_1',
+                                   '_GarageType_Attchd', '_LotFrontage', '_Exterior_HdBoard', '_HouseStyle_4',
+                                   '_MasVnrType_BrkFace', '_Exterior_Plywood', '_GarageQual', '_MasVnrType_Stone',
+                                   '_LandContour_2', '_BsmtFullBath', '_LotShape', '_Exterior_WdSdng',
+                                   '_Neighborhood_8', '_Fence', '_LotConfig_1', '_Alley', '_Exterior_MetalSd',
+                                   '_EnclosedPorch', '_LotConfig_3', '_BsmtCond', '_MasVnrArea',
+                                   '_SaleCondition_Partial', '_GarageType_Detchd', '_MSZoning_3', '_ExterCond',
+                                   '_Neighborhood_2', '_QuarterSold', '_BsmtFinSF1', '_BedroomAbvGr', '_OpenPorchSF',
+                                   '_Foundation_1', '_MSSubClass_2']
 
-    with open(file, 'r') as fp:
-        data = json.load(fp)
-    return data
-
-
-if __name__ == "__main__":
-    conf_global = {}  # dict with global project configuration
-    conf_ridge = {}  # dict with configuration for ridge model
-    conf_lasso = {}  # dict with configuration for lasso model
-    conf_elastic = {}  # dict with configuration for elastic model
-    conf_svr = {}  # dict with configuration for SVR model
-    conf_kneighbors = {}  # dict with configuration for kneighbors model
-    conf_bridge = {}  # dict with configuration for  bayesian ridge model
-    conf_forest = {}  # dict with configuration for  random forest model
-    conf_keras = {}  # dict with configuration for  keras dense 2 layer model
-
-    # Make global configuration
-    conf_global = {}
-    conf_global['all_features'] = ['_BldgType_2', '_BldgType_1', '_BldgType_3', '_GrLivArea', '_MSSubClass_3', '_OverallQual', '_BuildingAge', '_TotalBsmtSF', '_Functional', '_CentralAir', '_Electrical', '_SaleCondition_Abnorml', '_RoofStyle_1', '_LotArea', '_GarageArea', '_KitchenQual', '_OverallCond', '_Neighborhood_9', '_SaleType_WD', '_ScreenPorch', '_BsmtExposure', '_ExterQual', '_BsmtUnfSF', '_Foundation_2', '_HouseStyle_2', '_HouseStyle_3', '_LotConfig_4', '_GarageType_BuiltIn', '_FullBath', '_Neighborhood_1', '_FireplaceQu', '_BsmtQual', '_SaleCondition_Normal', '_BsmtFinType1', '_PavedDrive', '_Foundation_3', '_MSZoning_1', '_Neighborhood_5', '_HeatingQC', '_YrSold', '_HalfBath', '_YearRemodAdd', '_GarageFinish', '_HouseStyle_1', '_BsmtFinSF2', '_WoodDeckSF', '_Exterior_VinylSd', '_MSSubClass_1', '_GarageType_Attchd', '_LotFrontage', '_Exterior_HdBoard', '_HouseStyle_4', '_MasVnrType_BrkFace', '_Exterior_Plywood', '_GarageQual', '_MasVnrType_Stone', '_LandContour_2', '_BsmtFullBath', '_LotShape', '_Exterior_WdSdng', '_Neighborhood_8', '_Fence', '_LotConfig_1', '_Alley', '_Exterior_MetalSd', '_EnclosedPorch', '_LotConfig_3', '_BsmtCond', '_MasVnrArea', '_SaleCondition_Partial', '_GarageType_Detchd', '_MSZoning_3', '_ExterCond', '_Neighborhood_2', '_QuarterSold', '_BsmtFinSF1', '_BedroomAbvGr', '_OpenPorchSF', '_Foundation_1', '_MSSubClass_2']
-
-    conf_global['n_all_features']=len(conf_global['all_features'] )
+    conf_global['n_all_features'] = len(conf_global['all_features'])
 
     conf_global['project_path'] = '/home/peterpirog/PycharmProjects/BostonEnsemble'
     conf_global['train_csv_path'] = conf_global['project_path'] + "/data_files/train.csv"
@@ -42,15 +38,21 @@ if __name__ == "__main__":
 
     conf_global['target_label'] = 'SalePrice_log1'
 
-    with open('conf_global.json', 'w') as fp:
+    with open(filename, 'w') as fp:
         json.dump(conf_global, fp)
+    return conf_global
 
+
+def create_ridge_conf(conf_global=None, filename='conf_ridge.json', conf_ridge={}):
     # 1 Make Ridge Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html?highlight=ridge#sklearn.linear_model.Ridge
 
-    conf_ridge['all_features'] = conf_global['all_features']
-    conf_ridge['n_features'] = 50
-    conf_ridge['alpha'] = 0.42761871907638627
+    try:
+        conf_svr['all_features'] = conf_global['all_features']
+    except:
+        pass
+    conf_ridge['n_features'] = 50  # TUNED
+    conf_ridge['alpha'] = 0.42761871907638627  # TUNED
     conf_ridge['fit_intercept'] = True
     conf_ridge['normalize'] = False
     conf_ridge['copy_X'] = True
@@ -59,19 +61,24 @@ if __name__ == "__main__":
     conf_ridge['solver'] = 'auto'
     conf_ridge['random_state'] = None
 
-    conf_ridge['output_file'] = 'model_ridge.joblib'
-    conf_ridge['json_file'] = 'conf_ridge.json'
+    # conf_ridge['output_file'] = 'model_ridge.joblib'
+    conf_ridge['json_file'] = filename
 
-    with open(conf_ridge['json_file'], 'w') as fp:
+    with open(filename, 'w') as fp:
         json.dump(conf_ridge, fp)
+    return conf_ridge
 
+
+def create_lasso_conf(conf_global=None, filename='conf_lasso.json', conf_lasso={}):
     # 2 Make Lasso Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html?highlight=lasso#sklearn.linear_model.Lasso
+    try:
+        conf_svr['all_features'] = conf_global['all_features']
+    except:
+        pass
 
-    conf_lasso['all_features'] = conf_global['all_features']
-    conf_lasso['n_features'] = 50
-
-    conf_lasso['alpha'] = 9.987200561243843e-05
+    conf_lasso['n_features'] = 50  # TUNE
+    conf_lasso['alpha'] = 9.987200561243843e-05  # TUNE
     conf_lasso['fit_intercept'] = True
     conf_lasso['normalize'] = False
     conf_lasso['precompute'] = False
@@ -83,20 +90,25 @@ if __name__ == "__main__":
     conf_lasso['random_state'] = 42
     conf_lasso['selection'] = 'cyclic'
 
-    conf_lasso['output_file'] = 'model_lasso.joblib'
-    conf_lasso['json_file'] = 'conf_lasso.json'
+    # conf_lasso['output_file'] = 'model_lasso.joblib'
+    conf_lasso['json_file'] = filename
 
-    with open(conf_lasso['json_file'], 'w') as fp:
+    with open(filename, 'w') as fp:
         json.dump(conf_lasso, fp)
+    return conf_lasso
 
+
+def create_elastic_conf(conf_global=None, filename='conf_elastic.json', conf_elastic={}):
     # Make Elastic Net Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html?highlight=elastic#sklearn.linear_model.ElasticNet
+    try:
+        conf_svr['all_features'] = conf_global['all_features']
+    except:
+        pass
+    conf_elastic['n_features'] = 50  # TUNE
 
-    conf_elastic['all_features'] = conf_global['all_features']
-    conf_elastic['n_features'] = 50
-
-    conf_elastic['alpha'] = 0.00010221867853787662
-    conf_elastic['l1_ratio'] = 0.9784366976103005
+    conf_elastic['alpha'] = 0.00010221867853787662  # TUNE
+    conf_elastic['l1_ratio'] = 0.9784366976103005  # TUNE
     conf_elastic['fit_intercept'] = True
     conf_elastic['normalize'] = False
     conf_elastic['precompute'] = False
@@ -108,36 +120,63 @@ if __name__ == "__main__":
     conf_elastic['random_state'] = 42
     conf_elastic['selection'] = 'cyclic'
 
-    conf_elastic['output_file'] = 'model_elastic.joblib'
-    conf_elastic['json_file'] = 'conf_elastic.json'
+    # conf_elastic['output_file'] = 'model_elastic.joblib'
+    conf_elastic['json_file'] = filename
 
-    with open(conf_elastic['json_file'], 'w') as fp:
+    with open(filename, 'w') as fp:
         json.dump(conf_elastic, fp)
+    return conf_elastic
 
+
+def create_svr_conf(conf_global=None, filename='svr.json', conf_svr={}):
     # Make SVR Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html?highlight=svr#sklearn.svm.SVR
+    try:
+        conf_svr['all_features'] = conf_global['all_features']
+    except:
+        pass
 
-#_ubc=0.16018423333335852 and parameters={'n_features': 65, 'kernel': 'rbf', 'degree': 3, 'gamma': 'scale', 'C': 0.8300336256308384, 'epsilon': 0.06521901988723335}
-    conf_svr['all_features'] = conf_global['all_features']
     conf_svr['n_features'] = 77
-
-    conf_svr['kernel'] = 'rbf'  # ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’
+    conf_svr['kernel'] = 'rbf'  # TUNE ‘linear’, ‘poly’, ‘rbf’, ‘sigmoid’, ‘precomputed’
     conf_svr['degree'] = 3
-    conf_svr['gamma'] = 'scale'  # ‘scale’, ‘auto’
+    conf_svr['gamma'] = 'scale'  # TUNE‘scale’, ‘auto’
     conf_svr['coef0'] = 0.0
     conf_svr['tol'] = 0.001
-    conf_svr['C'] = 0.7832573311079015
-    conf_svr['epsilon'] = 0.04825896120073174
+    conf_svr['C'] = 0.7832573311079015  # TUNE
+    conf_svr['epsilon'] = 0.04825896120073174  # TUNE
     conf_svr['shrinking'] = True
     conf_svr['cache_size'] = 200
     conf_svr['verbose'] = False
     conf_svr['max_iter'] = -1
 
-    conf_svr['output_file'] = 'model_svr.joblib'
-    conf_svr['json_file'] = 'conf_svr.json'
+    # conf_svr['output_file'] = 'model_svr.joblib'
+    conf_svr['json_file'] = filename
 
-    with open(conf_svr['json_file'], 'w') as fp:
+    with open(filename, 'w') as fp:
         json.dump(conf_svr, fp)
+    return conf_svr
+
+
+if __name__ == "__main__":
+    conf_kneighbors = {}  # dict with configuration for kneighbors model
+    conf_bridge = {}  # dict with configuration for  bayesian ridge model
+    conf_forest = {}  # dict with configuration for  random forest model
+    conf_keras = {}  # dict with configuration for  keras dense 2 layer model
+
+    # 1 create global configuration and save in conf_global.json file
+    conf_global = create_global_conf(filename='conf_global.json')
+
+    # 2 create ridge configuration and save in conf_ridge.json file
+    conf_ridge = create_ridge_conf(conf_global=conf_global, filename='conf_ridge.json')
+
+    # 3 create lasso configuration and save in conf_lasso.json file
+    conf_lasso = create_lasso_conf(conf_global=conf_global, filename='conf_lasso.json')
+
+    # 4 create elastic net configuration and save in conf_elastic.json file
+    conf_elastic = create_elastic_conf(conf_global=conf_global, filename='conf_elastic.json')
+
+    # 4 create elastic net configuration and save in conf_elastic.json file
+    conf_svr = create_svr_conf(conf_global=conf_global, filename='conf_svr.json')
 
     # Make KNeighbors Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.svm.SVR.html?highlight=svr#sklearn.svm.SVR
@@ -253,4 +292,4 @@ if __name__ == "__main__":
 
     with open(conf_keras['json_file'], 'w') as fp:
         json.dump(conf_keras, fp)
-#0.012148303911089897 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 136, 'hidden2': 27, 'activation1': 'elu', 'dropout1': 0.25}
+# 0.012148303911089897 and parameters={'batch': 64, 'learning_rate': 0.1, 'hidden1': 136, 'hidden2': 27, 'activation1': 'elu', 'dropout1': 0.25}

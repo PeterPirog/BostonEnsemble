@@ -6,8 +6,9 @@ from dill import dump
 import tensorflow as tf
 
 from sklearn.ensemble import StackingRegressor
-from tf.keras.models import load_model
-from sklearn.externals import joblib
+from tensorflow.keras.models import load_model
+#from sklearn.externals import joblib
+import joblib
 from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
 
 from sklearn.linear_model import RidgeCV
@@ -38,9 +39,9 @@ if __name__ == "__main__":
     model_lasso = load(filename='model_lasso.joblib')
     model_elastic = load(filename='model_elastic.joblib')
     model_svr = load(filename='model_svr.joblib')
-    model_kneighbors = load(filename='model_kneighbors.joblib')
-    model_bridge = load(filename='model_bridge.joblib')
-    model_rforest = load(filename='model_forest.joblib')
+    #model_kneighbors = load(filename='model_kneighbors.joblib')
+    #model_bridge = load(filename='model_bridge.joblib')
+    #model_rforest = load(filename='model_forest.joblib')
 
     #with open('keras_model.pkl', 'rb') as file:
     #    model_keras = pickle.load(file)
@@ -59,16 +60,16 @@ if __name__ == "__main__":
         ('lasso', model_lasso),
         ('elastic', model_elastic),
         ('svr', model_svr),
-        ('kneighbors', model_kneighbors),
-        ('bridge', model_bridge),
-        ('rforest', model_rforest),
+        #('kneighbors', model_kneighbors),
+        #('bridge', model_bridge),
+        #('rforest', model_rforest),
        # ('keras', model_keras),
         #('xgb', model_xgb)
     ]
     model = StackingRegressor(
         estimators=estimators,
         # final_estimator=RandomForestRegressor(n_estimators=30, random_state=42))
-        final_estimator=Ridge(), n_jobs=1)
+        final_estimator=Ridge(), n_jobs=-1)
 
     # train model with parameters defined in conf_ridge,json file
     model.fit(X=X, y=y)
@@ -91,6 +92,6 @@ if __name__ == "__main__":
     X_test = df_test[conf_global['all_features']]
     model_to_submission(model_file_pkl='model_stacked.pkl',X=X_test)
 
-    #v = Validator(model_or_pipeline=model, X=X, y=y, n_splits=10, n_repeats=5, random_state=1,
-    #              scoring='neg_root_mean_squared_error', model_config_dict=None)
-    #v.run()
+    v = Validator(model_or_pipeline=model, X=X, y=y, n_splits=10, n_repeats=5, random_state=1,
+                  scoring='neg_root_mean_squared_error', model_config_dict=None)
+    v.run()
