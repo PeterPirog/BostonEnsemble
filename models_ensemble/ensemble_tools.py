@@ -4,7 +4,16 @@ import json
 import numpy as np
 import pandas as pd
 import dill as pickle
+from pathlib import Path
 
+
+def read_config_files(configuration_name='conf_global'):
+    base_path = Path(__file__).parent.parent
+    file = str(base_path) + '/models_ensemble/' + configuration_name + '.json'
+
+    with open(file, 'r') as fp:
+        data = json.load(fp)
+    return data
 
 class FeatureByNameSelector(BaseEstimator, TransformerMixin):
     def __init__(self, all_features, n_features=None):
@@ -103,3 +112,11 @@ def model_to_submission(model_file_pkl,X):
         model = pickle.load(file)
         y_predicted=model.predict(X)
         create_submission_from_nparray(y_predicted)
+
+        def read_config_files(configuration_name='conf_global'):
+            base_path = Path(__file__).parent.parent
+            file = str(base_path) + '/models_ensemble/' + configuration_name + '.json'
+
+            with open(file, 'r') as fp:
+                data = json.load(fp)
+            return data

@@ -4,8 +4,8 @@ from joblib import dump, load
 
 from sklearn.linear_model import Ridge
 from sklearn.pipeline import Pipeline
-from ensemble_tools import FeatureByNameSelector, Validator
-from _create_json_conf import read_config_files
+from ensemble_tools import FeatureByNameSelector, Validator,read_config_files
+
 
 if __name__ == "__main__":
     conf_global = read_config_files(configuration_name='conf_global')
