@@ -86,11 +86,11 @@ if __name__ == "__main__":
         config={
             "alpha": tune.loguniform(1e-5, 100),
             "l1_ratio": tune.loguniform(1e-5, 1),
-            "n_features": tune.randint(1, 80)
+            "n_features": tune.choice([52]) #tune.randint(1, 80)
         }
 
     )
     print("Best result:",analysis.best_result,"Best hyperparameters found were: ", analysis.best_config)
     # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/elastic --bind_all --load_fast=false
-    #_ubc=0.16422055974545008 and parameters={'alpha': 0.00010221867853787662, 'l1_ratio': 0.9784366976103005, 'n_features': 50}
+    #_ubc': 0.1662048876948462, '_metric': 0.13857462698096043, parameters={'alpha': 0.0009225109891489221, 'l1_ratio': 0.9980638700389476, 'n_features': 52}
 

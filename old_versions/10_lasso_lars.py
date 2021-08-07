@@ -2,7 +2,7 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from sklearn.model_selection import RepeatedKFold, cross_val_score
-from sklearn.linear_model import  LassoLarsIC
+from sklearn.linear_model import  LassoLars
 
 if __name__ == "__main__":
     base_path = Path(__file__).parent.parent
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     for i in range(n_features):
 
         X = df[features_all[:i+1]]
-        model = LassoLarsIC(criterion='aic') # 'aic' , 'bic'
+        model = LassoLars(alpha=0.001)
     
         # define model evaluation method
         cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=1)
@@ -48,11 +48,11 @@ if __name__ == "__main__":
 
     #print(results)
     print(f'Minimum error is: {min_error} for {idx_min} features')
-    np.save("linear_errors.npy",results)
-    np.save("linear_errors.npy",results)
+    np.save("../preprocessing/linear_errors.npy", results)
+    np.save("../preprocessing/linear_errors.npy", results)
     df = pd.DataFrame(data=results, columns=["Features", "Mean","STD","Mean_2STD"])
     df.to_excel(
-        'model_lasso_larsIC_features.xlsx',
+        'model_lasso_lars_features.xlsx',
         sheet_name='Linear',
         index=False)
 

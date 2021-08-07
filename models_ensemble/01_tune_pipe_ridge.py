@@ -106,13 +106,12 @@ if __name__ == "__main__":
         },
         config={
             "alpha": tune.loguniform(1e-5, 100),
-            "n_features": tune.randint(1, 80)
+            "n_features": tune.choice([52]) #tune.randint(1, 80)
         }
 
     )
     print("Best result:",analysis.best_result)
     print("Best hyperparameters found were: ", analysis.best_config)
     # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/ridge --bind_all --load_fast=false
-    #'_std': 0.014156917636511966, '_ubc': 0.16426060089180344, '_metric': 0.1359467656187795
-    # {'alpha': 0.424205265420875, 'n_features': 50}
+    #_ubc': 0.16704883863110265, '_metric': 0.1388039787687334, and parameters = {'alpha': 0.9581973728969789, 'n_features': 52}
 

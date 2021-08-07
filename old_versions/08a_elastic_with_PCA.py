@@ -2,7 +2,10 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 from sklearn.model_selection import RepeatedKFold, cross_val_score
-from sklearn.linear_model import  LassoLars
+from sklearn.linear_model import ElasticNet
+from sklearn.pipeline import Pipeline
+from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
 
 if __name__ == "__main__":
     base_path = Path(__file__).parent.parent
@@ -17,9 +20,16 @@ if __name__ == "__main__":
     min_error=np.inf
     idx_min=None
     for i in range(n_features):
+        pca=PCA(n_components=i+1)
+        ssc=StandardScaler()
+        pipe=Pipeline([
+            ('pca',pca),
+            ('ssc',ssc),
+        ])
 
-        X = df[features_all[:i+1]]
-        model = LassoLars(alpha=0.001)
+        #X = df[features_all[:i+1]]
+        X = pipe.fit_transform(df[features_all])
+        model = ElasticNet(alpha=0.003510088701079035, l1_ratio=0.12)
     
         # define model evaluation method
         cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=1)
@@ -37,7 +47,7 @@ if __name__ == "__main__":
         M=scores.mean()
         STD=scores.std()
     
-        print(f'Number of Features: {i+1}','Mean RMSLE: %.4f (%.4f)' % (M, STD))
+        print(f'Number of PCA components: {i+1}','Mean RMSLE: %.4f (%.4f)' % (M, STD))
         results[i,0]=i+1
         results[i, 1] = M
         results[i, 2] = STD
@@ -48,11 +58,11 @@ if __name__ == "__main__":
 
     #print(results)
     print(f'Minimum error is: {min_error} for {idx_min} features')
-    np.save("linear_errors.npy",results)
-    np.save("linear_errors.npy",results)
+    np.save("../preprocessing/linear_errors.npy", results)
+    np.save("../preprocessing/linear_errors.npy", results)
     df = pd.DataFrame(data=results, columns=["Features", "Mean","STD","Mean_2STD"])
     df.to_excel(
-        'model_lasso_lars_features.xlsx',
+        'model_elastic_net_PCA_components.xlsx',
         sheet_name='Linear',
         index=False)
 

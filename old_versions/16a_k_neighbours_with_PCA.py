@@ -69,7 +69,7 @@ if __name__ == "__main__":
             idx_min = i + 1
 
     print(f'Minimum error is: {min_error} for {idx_min} features')
-    np.save("linear_errors.npy", results)
+    np.save("../preprocessing/linear_errors.npy", results)
     df = pd.DataFrame(data=results, columns=["Features", "Mean", "STD", "Mean_2STD"])
     df.to_excel(
         'model_KNeighbors_PCA_features.xlsx',
