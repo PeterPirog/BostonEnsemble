@@ -97,3 +97,4 @@ if __name__ == "__main__":
     )
     print("Best result:", analysis.best_result, "Best hyperparameters found were: ", analysis.best_config)
     # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/svr --bind_all --load_fast=false
+#for 52 features {'_ubc': 0.15955697496291676, '_metric': 0.12887048395904535,  {'n_features': 52, 'kernel': 'rbf', 'degree': 2, 'gamma': 'auto', 'C': 6.41610938642463, 'epsilon': 0.0506613241942264}
