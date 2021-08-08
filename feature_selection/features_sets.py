@@ -110,21 +110,16 @@ backward_kneighbors = ['_BldgType_1', '_GrLivArea', '_MSSubClass_3', '_OverallQu
                        '_BsmtFinSF1', '_BedroomAbvGr', '_Foundation_1']
 
 # mlxtend 52 features backward  XGBRegressor(n_estimators=144,max_depth=6,eta=0.1,subsample=1,colsample_bytree=1)
-# backward_xgboost=['_BldgType_2', '_GrLivArea', '_OverallQual', '_BuildingAge',
-#        '_TotalBsmtSF', '_Functional', '_CentralAir', '_Electrical',
-#        '_SaleCondition_Abnorml', '_RoofStyle_1', '_LotArea', '_GarageArea',
-#        '_KitchenQual', '_OverallCond', '_Neighborhood_9', '_SaleType_WD',
-#        '_ScreenPorch', '_BsmtExposure', '_BsmtUnfSF', '_LotConfig_4',
-#        '_FullBath', '_FireplaceQu', '_BsmtQual', '_SaleCondition_Normal',
-#        '_BsmtFinType1', '_PavedDrive', '_MSZoning_1', '_Neighborhood_5',
-#        '_HeatingQC', '_YrSold', '_YearRemodAdd', '_GarageFinish',
-#        '_Exterior_VinylSd', '_GarageType_Attchd', '_LotFrontage',
-#        '_HouseStyle_4', '_GarageQual', '_BsmtFullBath', '_LotShape',
-#        '_Neighborhood_8', '_EnclosedPorch', '_BsmtCond', '_MasVnrArea',
-#        '_GarageType_Detchd', '_MSZoning_3', '_ExterCond', '_Neighborhood_2',
-#        '_QuarterSold', '_BsmtFinSF1', '_BedroomAbvGr', '_OpenPorchSF',
-#        '_Foundation_1']
-
+backward_xgboost = ['_BldgType_2', '_GrLivArea', '_OverallQual', '_BuildingAge', '_TotalBsmtSF', '_Functional',
+                    '_CentralAir', '_Electrical', '_SaleCondition_Abnorml', '_RoofStyle_1', '_LotArea', '_GarageArea',
+                    '_KitchenQual', '_OverallCond', '_Neighborhood_9', '_SaleType_WD', '_ScreenPorch', '_BsmtExposure',
+                    '_BsmtUnfSF', '_LotConfig_4', '_FullBath', '_FireplaceQu', '_BsmtQual', '_SaleCondition_Normal',
+                    '_BsmtFinType1', '_PavedDrive', '_MSZoning_1', '_Neighborhood_5', '_HeatingQC', '_YrSold',
+                    '_YearRemodAdd', '_GarageFinish', '_Exterior_VinylSd', '_GarageType_Attchd', '_LotFrontage',
+                    '_HouseStyle_4', '_GarageQual', '_BsmtFullBath', '_LotShape', '_Neighborhood_8', '_EnclosedPorch',
+                    '_BsmtCond', '_MasVnrArea', '_GarageType_Detchd', '_MSZoning_3', '_ExterCond', '_Neighborhood_2',
+                    '_QuarterSold', '_BsmtFinSF1', '_BedroomAbvGr', '_OpenPorchSF', '_Foundation_1']
+# c
 # mlxtend 52 features forward  XGBRegressor(n_estimators=144,max_depth=6,eta=0.1,subsample=1,colsample_bytree=1)
 # forward_xgboost
 if __name__ == "__main__":
