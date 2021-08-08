@@ -121,6 +121,26 @@ backward_xgboost = ['_BldgType_2', '_GrLivArea', '_OverallQual', '_BuildingAge',
                     '_QuarterSold', '_BsmtFinSF1', '_BedroomAbvGr', '_OpenPorchSF', '_Foundation_1']
 # c
 # mlxtend 52 features forward  XGBRegressor(n_estimators=144,max_depth=6,eta=0.1,subsample=1,colsample_bytree=1)
+forward_xgboost=['_BldgType_3', '_GrLivArea', '_OverallQual', '_BuildingAge',
+       '_Electrical', '_SaleCondition_Abnorml', '_RoofStyle_1', '_LotArea',
+       '_GarageArea', '_KitchenQual', '_OverallCond', '_Neighborhood_9',
+       '_ScreenPorch', '_ExterQual', '_BsmtUnfSF', '_Foundation_2',
+       '_HouseStyle_2', '_HouseStyle_3', '_LotConfig_4', '_GarageType_BuiltIn',
+       '_FullBath', '_Neighborhood_1', '_SaleCondition_Normal',
+       '_Foundation_3', '_MSZoning_1', '_HeatingQC', '_YrSold', '_HalfBath',
+       '_HouseStyle_1', '_BsmtFinSF2', '_Exterior_VinylSd', '_MSSubClass_1',
+       '_Exterior_HdBoard', '_HouseStyle_4', '_MasVnrType_BrkFace',
+       '_Exterior_Plywood', '_MasVnrType_Stone', '_LandContour_2',
+       '_Exterior_WdSdng', '_Neighborhood_8', '_Fence', '_LotConfig_1',
+       '_Exterior_MetalSd', '_LotConfig_3', '_SaleCondition_Partial',
+       '_GarageType_Detchd', '_Neighborhood_2', '_QuarterSold', '_BsmtFinSF1',
+       '_BedroomAbvGr', '_Foundation_1', '_MSSubClass_2']
+
+# mlxtend 52 features backward  SVR(kernel='rbf', degree=3, gamma='scale', C=0.7832573311079015, epsilon=0.04825896120073174)
+
+
+# mlxtend 52 features forward  SVR(kernel='rbf', degree=3, gamma='scale', C=0.7832573311079015, epsilon=0.04825896120073174)
+
 # forward_xgboost
 if __name__ == "__main__":
     pass

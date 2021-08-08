@@ -7,7 +7,7 @@ from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import ElasticNet
 from sklearn.neighbors import KNeighborsRegressor
 from xgboost import XGBRegressor
-
+from sklearn.svm import SVR
 
 if __name__ == "__main__":
     conf_global = read_config_files(configuration_name='conf_global')
@@ -37,13 +37,12 @@ if __name__ == "__main__":
     y = df['SalePrice_log1']
 
     # step backward feature selection algorithm
-
     cv = KFold(n_splits=5, shuffle=True, random_state=42)
-    sfs = SFS(XGBRegressor(n_estimators=144,
-                             max_depth=6,
-                             eta=0.1,
-                             subsample=1,
-                             colsample_bytree=1),
+    sfs = SFS(SVR(kernel='rbf',
+                  degree=3,
+                  gamma='scale',
+                  C=0.7832573311079015,
+                  epsilon=0.04825896120073174),
               k_features=52,
               forward=False,
               floating=False,
@@ -53,5 +52,3 @@ if __name__ == "__main__":
 
     sfs = sfs.fit(X, y)
     print(X.columns[list(sfs.k_feature_idx_)])
-
-
