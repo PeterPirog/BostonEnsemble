@@ -18,20 +18,20 @@ all_features = ['_BldgType_2', '_BldgType_1', '_BldgType_3', '_GrLivArea', '_MSS
                 '_Foundation_1', '_MSSubClass_2']
 
 # mlxtend 52 features backward RandomForestRegressor(n_estimators=100, n_jobs=-1, random_state=10)
-back_forest = ['_BldgType_1', '_BldgType_3', '_GrLivArea', '_OverallQual',
-               '_BuildingAge', '_TotalBsmtSF', '_CentralAir', '_SaleCondition_Abnorml',
-               '_LotArea', '_GarageArea', '_KitchenQual', '_OverallCond',
-               '_Neighborhood_9', '_BsmtExposure', '_ExterQual', '_BsmtUnfSF',
-               '_Foundation_2', '_HouseStyle_2', '_HouseStyle_3', '_FullBath',
-               '_Neighborhood_1', '_FireplaceQu', '_BsmtQual', '_SaleCondition_Normal',
-               '_Foundation_3', '_MSZoning_1', '_Neighborhood_5', '_HalfBath',
-               '_YearRemodAdd', '_HouseStyle_1', '_BsmtFinSF2', '_WoodDeckSF',
-               '_Exterior_VinylSd', '_Exterior_HdBoard', '_MasVnrType_BrkFace',
-               '_GarageQual', '_LandContour_2', '_BsmtFullBath', '_Neighborhood_8',
-               '_Fence', '_LotConfig_1', '_Alley', '_LotConfig_3', '_BsmtCond',
-               '_SaleCondition_Partial', '_GarageType_Detchd', '_MSZoning_3',
-               '_ExterCond', '_Neighborhood_2', '_BsmtFinSF1', '_OpenPorchSF',
-               '_MSSubClass_2']
+backward_forest = ['_BldgType_1', '_BldgType_3', '_GrLivArea', '_OverallQual',
+                   '_BuildingAge', '_TotalBsmtSF', '_CentralAir', '_SaleCondition_Abnorml',
+                   '_LotArea', '_GarageArea', '_KitchenQual', '_OverallCond',
+                   '_Neighborhood_9', '_BsmtExposure', '_ExterQual', '_BsmtUnfSF',
+                   '_Foundation_2', '_HouseStyle_2', '_HouseStyle_3', '_FullBath',
+                   '_Neighborhood_1', '_FireplaceQu', '_BsmtQual', '_SaleCondition_Normal',
+                   '_Foundation_3', '_MSZoning_1', '_Neighborhood_5', '_HalfBath',
+                   '_YearRemodAdd', '_HouseStyle_1', '_BsmtFinSF2', '_WoodDeckSF',
+                   '_Exterior_VinylSd', '_Exterior_HdBoard', '_MasVnrType_BrkFace',
+                   '_GarageQual', '_LandContour_2', '_BsmtFullBath', '_Neighborhood_8',
+                   '_Fence', '_LotConfig_1', '_Alley', '_LotConfig_3', '_BsmtCond',
+                   '_SaleCondition_Partial', '_GarageType_Detchd', '_MSZoning_3',
+                   '_ExterCond', '_Neighborhood_2', '_BsmtFinSF1', '_OpenPorchSF',
+                   '_MSSubClass_2']
 
 # mlxtend 52 features forward RandomForestRegressor(n_estimators=100, n_jobs=-1, random_state=10)
 forward_forest = ['_BldgType_2', '_BldgType_1', '_GrLivArea', '_OverallQual',
@@ -121,26 +121,84 @@ backward_xgboost = ['_BldgType_2', '_GrLivArea', '_OverallQual', '_BuildingAge',
                     '_QuarterSold', '_BsmtFinSF1', '_BedroomAbvGr', '_OpenPorchSF', '_Foundation_1']
 # c
 # mlxtend 52 features forward  XGBRegressor(n_estimators=144,max_depth=6,eta=0.1,subsample=1,colsample_bytree=1)
-forward_xgboost=['_BldgType_3', '_GrLivArea', '_OverallQual', '_BuildingAge',
-       '_Electrical', '_SaleCondition_Abnorml', '_RoofStyle_1', '_LotArea',
-       '_GarageArea', '_KitchenQual', '_OverallCond', '_Neighborhood_9',
-       '_ScreenPorch', '_ExterQual', '_BsmtUnfSF', '_Foundation_2',
-       '_HouseStyle_2', '_HouseStyle_3', '_LotConfig_4', '_GarageType_BuiltIn',
-       '_FullBath', '_Neighborhood_1', '_SaleCondition_Normal',
-       '_Foundation_3', '_MSZoning_1', '_HeatingQC', '_YrSold', '_HalfBath',
-       '_HouseStyle_1', '_BsmtFinSF2', '_Exterior_VinylSd', '_MSSubClass_1',
-       '_Exterior_HdBoard', '_HouseStyle_4', '_MasVnrType_BrkFace',
-       '_Exterior_Plywood', '_MasVnrType_Stone', '_LandContour_2',
-       '_Exterior_WdSdng', '_Neighborhood_8', '_Fence', '_LotConfig_1',
-       '_Exterior_MetalSd', '_LotConfig_3', '_SaleCondition_Partial',
-       '_GarageType_Detchd', '_Neighborhood_2', '_QuarterSold', '_BsmtFinSF1',
-       '_BedroomAbvGr', '_Foundation_1', '_MSSubClass_2']
+forward_xgboost = ['_BldgType_3', '_GrLivArea', '_OverallQual', '_BuildingAge',
+                   '_Electrical', '_SaleCondition_Abnorml', '_RoofStyle_1', '_LotArea',
+                   '_GarageArea', '_KitchenQual', '_OverallCond', '_Neighborhood_9',
+                   '_ScreenPorch', '_ExterQual', '_BsmtUnfSF', '_Foundation_2',
+                   '_HouseStyle_2', '_HouseStyle_3', '_LotConfig_4', '_GarageType_BuiltIn',
+                   '_FullBath', '_Neighborhood_1', '_SaleCondition_Normal',
+                   '_Foundation_3', '_MSZoning_1', '_HeatingQC', '_YrSold', '_HalfBath',
+                   '_HouseStyle_1', '_BsmtFinSF2', '_Exterior_VinylSd', '_MSSubClass_1',
+                   '_Exterior_HdBoard', '_HouseStyle_4', '_MasVnrType_BrkFace',
+                   '_Exterior_Plywood', '_MasVnrType_Stone', '_LandContour_2',
+                   '_Exterior_WdSdng', '_Neighborhood_8', '_Fence', '_LotConfig_1',
+                   '_Exterior_MetalSd', '_LotConfig_3', '_SaleCondition_Partial',
+                   '_GarageType_Detchd', '_Neighborhood_2', '_QuarterSold', '_BsmtFinSF1',
+                   '_BedroomAbvGr', '_Foundation_1', '_MSSubClass_2']
 
 # mlxtend 52 features backward  SVR(kernel='rbf', degree=3, gamma='scale', C=0.7832573311079015, epsilon=0.04825896120073174)
-
+backward_svr = ['_BldgType_2', '_BldgType_1', '_GrLivArea', '_OverallQual',
+                '_BuildingAge', '_TotalBsmtSF', '_Functional', '_CentralAir',
+                '_Electrical', '_SaleCondition_Abnorml', '_LotArea', '_GarageArea',
+                '_KitchenQual', '_OverallCond', '_Neighborhood_9', '_SaleType_WD',
+                '_ScreenPorch', '_ExterQual', '_HouseStyle_2', '_FullBath',
+                '_Neighborhood_1', '_FireplaceQu', '_BsmtQual', '_PavedDrive',
+                '_Foundation_3', '_MSZoning_1', '_Neighborhood_5', '_HeatingQC',
+                '_YrSold', '_HalfBath', '_YearRemodAdd', '_GarageFinish',
+                '_HouseStyle_1', '_WoodDeckSF', '_MSSubClass_1', '_GarageType_Attchd',
+                '_HouseStyle_4', '_GarageQual', '_MasVnrType_Stone', '_LandContour_2',
+                '_BsmtFullBath', '_LotShape', '_Alley', '_Exterior_MetalSd',
+                '_BsmtCond', '_SaleCondition_Partial', '_GarageType_Detchd',
+                '_Neighborhood_2', '_BsmtFinSF1', '_BedroomAbvGr', '_Foundation_1',
+                '_MSSubClass_2']
 
 # mlxtend 52 features forward  SVR(kernel='rbf', degree=3, gamma='scale', C=0.7832573311079015, epsilon=0.04825896120073174)
+forward_svr = ['_BldgType_2', '_BldgType_1', '_BldgType_3', '_GrLivArea',
+               '_MSSubClass_3', '_OverallQual', '_BuildingAge', '_TotalBsmtSF',
+               '_Functional', '_CentralAir', '_Electrical', '_LotArea', '_GarageArea',
+               '_KitchenQual', '_OverallCond', '_Neighborhood_9', '_SaleType_WD',
+               '_ScreenPorch', '_ExterQual', '_HouseStyle_2', '_HouseStyle_3',
+               '_GarageType_BuiltIn', '_FullBath', '_Neighborhood_1', '_FireplaceQu',
+               '_BsmtQual', '_PavedDrive', '_Foundation_3', '_Neighborhood_5',
+               '_HeatingQC', '_HalfBath', '_YearRemodAdd', '_GarageFinish',
+               '_HouseStyle_1', '_WoodDeckSF', '_MSSubClass_1', '_GarageType_Attchd',
+               '_LotFrontage', '_HouseStyle_4', '_GarageQual', '_MasVnrType_Stone',
+               '_LandContour_2', '_Neighborhood_8', '_Exterior_MetalSd', '_BsmtCond',
+               '_SaleCondition_Partial', '_GarageType_Detchd', '_Neighborhood_2',
+               '_BsmtFinSF1', '_BedroomAbvGr', '_Foundation_1', '_MSSubClass_2']
 
-# forward_xgboost
+# mlxtend 52 features backward  LGBMRegressor(boosting_type='gbdt',num_leaves=31, max_depth=- 1,learning_rate=0.1,n_estimators=100)
+# backward_lgbm=
+# mlxtend 52 features forward  LGBMRegressor(boosting_type='gbdt',num_leaves=31, max_depth=- 1,learning_rate=0.1,n_estimators=100)
+# forward_lgbm=
+
+
 if __name__ == "__main__":
+    list_of_results = [backward_forest,
+                       forward_forest,
+                       backward_elastic,
+                       forward_elastic,
+                       backward_kneighbors,
+                       forward_kneighbors,
+                       backward_xgboost,
+                       forward_xgboost,
+                       backward_svr,
+                       forward_svr]
+    importance_dict = {}
+
+    for feature in all_features:
+        importance_dict[feature] = 100  # maximum initial value
+
+        for single_list in list_of_results:
+            #print(single_list, '\n')
+            if feature in single_list:
+                if single_list.index(feature)+1<importance_dict[feature]:
+                    importance_dict[feature] = single_list.index(feature) + 1
+
+    print(importance_dict)
+    sorted_x = dict(sorted(importance_dict.items(), key=lambda item: item[1]))
+
+    print(len(sorted_x),sorted_x)
+    for feature in sorted_x:
+        print(feature,sorted_x[feature])
     pass

@@ -8,6 +8,7 @@ from sklearn.linear_model import ElasticNet
 from sklearn.neighbors import KNeighborsRegressor
 from xgboost import XGBRegressor
 from sklearn.svm import SVR
+from lightgbm import LGBMRegressor
 
 if __name__ == "__main__":
     conf_global = read_config_files(configuration_name='conf_global')
@@ -38,11 +39,11 @@ if __name__ == "__main__":
 
     # step backward feature selection algorithm
     cv = KFold(n_splits=5, shuffle=True, random_state=42)
-    sfs = SFS(SVR(kernel='rbf',
-                  degree=3,
-                  gamma='scale',
-                  C=0.7832573311079015,
-                  epsilon=0.04825896120073174),
+    sfs = SFS(LGBMRegressor(boosting_type='gbdt',
+                            num_leaves=31,
+                            max_depth=- 1,
+                            learning_rate=0.1,
+                            n_estimators=100),
               k_features=52,
               forward=False,
               floating=False,
