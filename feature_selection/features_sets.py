@@ -190,15 +190,18 @@ if __name__ == "__main__":
         importance_dict[feature] = 100  # maximum initial value
 
         for single_list in list_of_results:
-            #print(single_list, '\n')
+            # print(single_list, '\n')
             if feature in single_list:
-                if single_list.index(feature)+1<importance_dict[feature]:
-                    importance_dict[feature] = single_list.index(feature) + 1
+                if single_list.index(feature) + 1 < importance_dict[feature]:
+                    importance_dict[feature] = single_list.index(
+                        feature) + 1  # get the best rank from any mlxtend score
 
     print(importance_dict)
     sorted_x = dict(sorted(importance_dict.items(), key=lambda item: item[1]))
 
-    print(len(sorted_x),sorted_x)
-    for feature in sorted_x:
-        print(feature,sorted_x[feature])
-    pass
+    print(len(sorted_x), sorted_x)
+    final_list = []
+    for i, feature in enumerate(sorted_x):
+        print(f'{i + 1}:{feature}, best rank: {sorted_x[feature]}')
+        final_list.append(feature)
+    print(final_list)
