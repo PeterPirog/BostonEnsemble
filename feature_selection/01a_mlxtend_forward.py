@@ -49,7 +49,7 @@ if __name__ == "__main__":
               forward=True,
               floating=False,
               verbose=2,
-              scoring='r2',
+              scoring='r2',# 'neg_root_mean_squared_error'
               cv=cv)
 
     sfs = sfs.fit(X, y)

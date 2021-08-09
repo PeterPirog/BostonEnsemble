@@ -39,16 +39,12 @@ if __name__ == "__main__":
 
     # step backward feature selection algorithm
     cv = KFold(n_splits=5, shuffle=True, random_state=42)
-    sfs = SFS(LGBMRegressor(boosting_type='gbdt',
-                            num_leaves=31,
-                            max_depth=- 1,
-                            learning_rate=0.1,
-                            n_estimators=100),
+    sfs = SFS(RandomForestRegressor(n_estimators=100, n_jobs=-1, random_state=10),
               k_features=52,
               forward=False,
               floating=False,
               verbose=2,
-              scoring='r2',
+              scoring='neg_root_mean_squared_error',#'r2'
               cv=cv)
 
     sfs = sfs.fit(X, y)
