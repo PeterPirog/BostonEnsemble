@@ -40,12 +40,16 @@ if __name__ == "__main__":
     # step backward feature selection algorithm
 
     cv = KFold(n_splits=5, shuffle=True, random_state=42)
-    sfs = SFS(KNeighborsRegressor(n_neighbors=7, weights='distance',algorithm='auto',leaf_size=83,p=1,metric='minkowski'),
-              k_features=80,
+    sfs = SFS(LGBMRegressor(boosting_type='gbdt',
+                            num_leaves=31,
+                            max_depth=- 1,
+                            learning_rate=0.1,
+                            n_estimators=100),
+              k_features=52,
               forward=True,
               floating=False,
               verbose=2,
-              scoring='neg_root_mean_squared_error',# 'neg_root_mean_squared_error' 'r2'
+              scoring='r2',# 'neg_root_mean_squared_error'
               cv=cv)
 
     sfs = sfs.fit(X, y)
