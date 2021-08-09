@@ -39,8 +39,8 @@ if __name__ == "__main__":
 
     # step backward feature selection algorithm
     cv = KFold(n_splits=5, shuffle=True, random_state=42)
-    sfs = SFS(RandomForestRegressor(n_estimators=100, n_jobs=-1, random_state=10),
-              k_features=33,
+    sfs = SFS(XGBRegressor(n_estimators=144,max_depth=6,eta=0.1,subsample=1,colsample_bytree=1),
+              k_features=32,
               forward=False,
               floating=False,
               verbose=2,
