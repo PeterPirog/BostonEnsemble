@@ -38,7 +38,8 @@ def train_boston(config):
     model = KNeighborsRegressor(n_neighbors=config["n_neighbors"],
                                 weights=config["weights"],# {‘uniform’, ‘distance’}
                                 p=config["p"],
-                                leaf_size=config["leaf_size"])
+                                leaf_size=config["leaf_size"],
+                                n_jobs=-1)
 
     cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=1)
 

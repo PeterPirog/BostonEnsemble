@@ -24,12 +24,6 @@ def train_boston(config):
     y = df['SalePrice_log1']
     X = df[all_features[:config['n_features']]]
 
-    model = SVR(kernel=config['kernel'],
-                degree=config['degree'],
-                gamma=config['gamma'],
-                C=config['C'],
-                epsilon=config['epsilon'])
-
     model = KNeighborsRegressor(n_neighbors=config["n_neighbors"],
                                 weights=config["weights"],  # {‘uniform’, ‘distance’}
                                 leaf_size=config["leaf_size"],
