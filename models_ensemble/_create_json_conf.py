@@ -1,26 +1,44 @@
 import json
+"""
+    features_all = ['_BldgType_2', '_BldgType_1', '_BldgType_3', '_GrLivArea', '_MSSubClass_3',
+                    '_OverallQual', '_BuildingAge', '_TotalBsmtSF', '_Functional', '_CentralAir',
+                    '_Electrical', '_SaleCondition_Abnorml', '_RoofStyle_1', '_LotArea', '_GarageArea',
+                    '_KitchenQual', '_OverallCond', '_Neighborhood_9', '_SaleType_WD', '_ScreenPorch',
+                    '_BsmtExposure', '_ExterQual', '_BsmtUnfSF', '_Foundation_2', '_HouseStyle_2',
+                    '_HouseStyle_3', '_LotConfig_4', '_GarageType_BuiltIn', '_FullBath',
+                    '_Neighborhood_1', '_FireplaceQu', '_BsmtQual', '_SaleCondition_Normal',
+                    '_BsmtFinType1', '_PavedDrive', '_Foundation_3', '_MSZoning_1', '_Neighborhood_5',
+                    '_HeatingQC', '_YrSold', '_HalfBath', '_YearRemodAdd', '_GarageFinish',
+                    '_HouseStyle_1', '_BsmtFinSF2', '_WoodDeckSF', '_Exterior_VinylSd', '_MSSubClass_1',
+                    '_GarageType_Attchd', '_LotFrontage', '_Exterior_HdBoard', '_HouseStyle_4',
+                    '_MasVnrType_BrkFace', '_Exterior_Plywood', '_GarageQual', '_MasVnrType_Stone',
+                    '_LandContour_2', '_BsmtFullBath', '_LotShape', '_Exterior_WdSdng',
+                    '_Neighborhood_8', '_Fence', '_LotConfig_1', '_Alley', '_Exterior_MetalSd',
+                    '_EnclosedPorch', '_LotConfig_3', '_BsmtCond', '_MasVnrArea',
+                    '_SaleCondition_Partial', '_GarageType_Detchd', '_MSZoning_3', '_ExterCond',
+                    '_Neighborhood_2', '_QuarterSold', '_BsmtFinSF1', '_BedroomAbvGr', '_OpenPorchSF',
+                    '_Foundation_1', '_MSSubClass_2']
+                    
 
+       
+"""
 
 def create_global_conf(filename='conf_global.json', conf_global={}):
     # create global configuration and save in conf_global.json file
-    conf_global['all_features'] = ['_BldgType_2', '_BldgType_1', '_BldgType_3', '_GrLivArea', '_MSSubClass_3',
-                                   '_OverallQual', '_BuildingAge', '_TotalBsmtSF', '_Functional', '_CentralAir',
-                                   '_Electrical', '_SaleCondition_Abnorml', '_RoofStyle_1', '_LotArea', '_GarageArea',
-                                   '_KitchenQual', '_OverallCond', '_Neighborhood_9', '_SaleType_WD', '_ScreenPorch',
-                                   '_BsmtExposure', '_ExterQual', '_BsmtUnfSF', '_Foundation_2', '_HouseStyle_2',
-                                   '_HouseStyle_3', '_LotConfig_4', '_GarageType_BuiltIn', '_FullBath',
-                                   '_Neighborhood_1', '_FireplaceQu', '_BsmtQual', '_SaleCondition_Normal',
-                                   '_BsmtFinType1', '_PavedDrive', '_Foundation_3', '_MSZoning_1', '_Neighborhood_5',
-                                   '_HeatingQC', '_YrSold', '_HalfBath', '_YearRemodAdd', '_GarageFinish',
-                                   '_HouseStyle_1', '_BsmtFinSF2', '_WoodDeckSF', '_Exterior_VinylSd', '_MSSubClass_1',
-                                   '_GarageType_Attchd', '_LotFrontage', '_Exterior_HdBoard', '_HouseStyle_4',
-                                   '_MasVnrType_BrkFace', '_Exterior_Plywood', '_GarageQual', '_MasVnrType_Stone',
-                                   '_LandContour_2', '_BsmtFullBath', '_LotShape', '_Exterior_WdSdng',
-                                   '_Neighborhood_8', '_Fence', '_LotConfig_1', '_Alley', '_Exterior_MetalSd',
-                                   '_EnclosedPorch', '_LotConfig_3', '_BsmtCond', '_MasVnrArea',
-                                   '_SaleCondition_Partial', '_GarageType_Detchd', '_MSZoning_3', '_ExterCond',
-                                   '_Neighborhood_2', '_QuarterSold', '_BsmtFinSF1', '_BedroomAbvGr', '_OpenPorchSF',
-                                   '_Foundation_1', '_MSSubClass_2']
+    conf_global['all_features'] = ['_BldgType_1', '_BldgType_3', '_GrLivArea', '_OverallQual',
+       '_BuildingAge', '_TotalBsmtSF', '_CentralAir', '_SaleCondition_Abnorml',
+       '_LotArea', '_GarageArea', '_KitchenQual', '_OverallCond',
+       '_Neighborhood_9', '_BsmtExposure', '_ExterQual', '_BsmtUnfSF',
+       '_Foundation_2', '_HouseStyle_2', '_HouseStyle_3', '_FullBath',
+       '_Neighborhood_1', '_FireplaceQu', '_BsmtQual', '_SaleCondition_Normal',
+       '_Foundation_3', '_MSZoning_1', '_Neighborhood_5', '_HalfBath',
+       '_YearRemodAdd', '_HouseStyle_1', '_BsmtFinSF2', '_WoodDeckSF',
+       '_Exterior_VinylSd', '_Exterior_HdBoard', '_MasVnrType_BrkFace',
+       '_GarageQual', '_LandContour_2', '_BsmtFullBath', '_Neighborhood_8',
+       '_Fence', '_LotConfig_1', '_Alley', '_LotConfig_3', '_BsmtCond',
+       '_SaleCondition_Partial', '_GarageType_Detchd', '_MSZoning_3',
+       '_ExterCond', '_Neighborhood_2', '_BsmtFinSF1', '_OpenPorchSF',
+       '_MSSubClass_2']
 
     conf_global['n_all_features'] = len(conf_global['all_features'])
 
@@ -183,6 +201,36 @@ def create_neighbors_conf(conf_global=None, filename='conf_kneighbors.json',conf
         json.dump(conf_kneighbors, fp)
     return conf_kneighbors
 
+def create_bridge_conf(conf_global=None, filename='conf_bridge.json',conf_bridge={}):
+    # Make Bayesian Ridge Configuration
+    # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html?highlight=ridge#sklearn.linear_model.Ridge
+
+    try:
+        conf_bridge['all_features'] = conf_global['all_features']
+    except:
+        pass
+    conf_bridge['n_features'] = 65
+
+    conf_bridge['n_iter'] = 300
+    conf_bridge['tol'] = 0.001
+    conf_bridge['alpha_1'] = 3.114173891282374e-07
+    conf_bridge['alpha_2'] = 0.0006005301305242927
+    conf_bridge['lambda_1'] = 986.4034769373696
+    conf_bridge['lambda_2'] = 3.3576325805597858
+    conf_bridge['alpha_init'] = None
+    conf_bridge['lambda_init'] = None
+    conf_bridge['compute_score'] = False
+    conf_bridge['fit_intercept'] = True
+    conf_bridge['normalize'] = False
+    conf_bridge['copy_X'] = True
+    conf_bridge['verbose'] = False
+
+    conf_bridge['output_file'] = 'model_bridge.joblib'
+    conf_bridge['json_file'] = filename
+
+    with open(filename, 'w') as fp:
+        json.dump(conf_bridge, fp)
+    return conf_bridge
 
 if __name__ == "__main__":
     conf_bridge = {}  # dict with configuration for  bayesian ridge model
@@ -201,37 +249,16 @@ if __name__ == "__main__":
     # 4 create elastic net configuration and save in conf_elastic.json file
     conf_elastic = create_elastic_conf(conf_global=conf_global, filename='conf_elastic.json')
 
-    # 5 create svr configuration and save in conf_elastic.json file
+    # 5 create svr configuration and save in conf_svr.json file
     conf_svr = create_svr_conf(conf_global=conf_global, filename='conf_svr.json')
 
-    # 6 create k-neighbors configuration and save in conf_elastic.json file
+    # 6 create k-neighbors configuration and save in conf_kneighbors.json file
     conf_kneighbors = create_neighbors_conf(conf_global=conf_global, filename='conf_kneighbors.json')
 
-    # Make Bayesian Ridge Configuration
-    # https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html?highlight=ridge#sklearn.linear_model.Ridge
+    # 7 createbridge configuration and save in conf_ridge.json file
+    conf_bridge = create_ridge_conf(conf_global=conf_global, filename='conf_ridge.json')
 
-    conf_bridge['all_features'] = conf_global['all_features']
-    conf_bridge['n_features'] = 65
 
-    conf_bridge['n_iter'] = 300
-    conf_bridge['tol'] = 0.001
-    conf_bridge['alpha_1'] = 3.114173891282374e-07
-    conf_bridge['alpha_2'] = 0.0006005301305242927
-    conf_bridge['lambda_1'] = 986.4034769373696
-    conf_bridge['lambda_2'] = 3.3576325805597858
-    conf_bridge['alpha_init'] = None
-    conf_bridge['lambda_init'] = None
-    conf_bridge['compute_score'] = False
-    conf_bridge['fit_intercept'] = True
-    conf_bridge['normalize'] = False
-    conf_bridge['copy_X'] = True
-    conf_bridge['verbose'] = False
-
-    conf_bridge['output_file'] = 'model_bridge.joblib'
-    conf_bridge['json_file'] = 'conf_bridge.json'
-
-    with open(conf_bridge['json_file'], 'w') as fp:
-        json.dump(conf_bridge, fp)
 
     # Make Random Forest Configuration
     # https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestRegressor.html?highlight=randomforestregressor#sklearn.ensemble.RandomForestRegressor

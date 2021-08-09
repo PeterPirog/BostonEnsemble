@@ -1,0 +1,10 @@
+
+Light GBM
+git clone --recursive https://github.com/microsoft/LightGBM.git
+cd LightGBM/python-package
+python setup.py bdist_wheel
+
+Sklearn
+git clone --recursive https://github.com/scikit-learn/scikit-learn.git
+
+python setup.py bdist_wheel

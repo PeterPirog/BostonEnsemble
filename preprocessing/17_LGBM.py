@@ -20,7 +20,7 @@ if __name__ == "__main__":
 
         X = df[features_all[:i+1]]
 
-        model=LGBMRegressor(boosting_type='gbdt', #'gbdt' 'dart'
+        model=LGBMRegressor(boosting_type='gbdt',
                             num_leaves=31,
                             max_depth=- 1,
                             learning_rate=0.1,

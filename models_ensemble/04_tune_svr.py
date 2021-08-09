@@ -85,7 +85,7 @@ if __name__ == "__main__":
             # "gpu": 0
         },
         config={
-            "n_features": tune.randint(1, 80),
+            "n_features": tune.choice([52]) ,#tune.randint(1, 80)
             # model parameters
             'kernel': tune.choice(['linear', 'poly', 'rbf', 'sigmoid']),  # 'linear', 'poly', 'rbf', 'sigmoid'
             'degree': tune.choice([2, 3]),  # 2, 3
@@ -97,4 +97,4 @@ if __name__ == "__main__":
     )
     print("Best result:", analysis.best_result, "Best hyperparameters found were: ", analysis.best_config)
     # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/svr --bind_all --load_fast=false
-#_ubc=0.16018423333335852 and parameters={'n_features': 65, 'kernel': 'rbf', 'degree': 3, 'gamma': 'scale', 'C': 0.8300336256308384, 'epsilon': 0.06521901988723335}
+#for 52 features {'_ubc': 0.15955697496291676, '_metric': 0.12887048395904535,  {'n_features': 52, 'kernel': 'rbf', 'degree': 2, 'gamma': 'auto', 'C': 6.41610938642463, 'epsilon': 0.0506613241942264}
