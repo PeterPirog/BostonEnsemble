@@ -213,6 +213,14 @@ backward_xgboost_r2 = ['_BldgType_2', '_GrLivArea', '_OverallQual', '_BuildingAg
                        '_EnclosedPorch',
                        '_BsmtCond', '_MasVnrArea', '_GarageType_Detchd', '_MSZoning_3', '_ExterCond', '_Neighborhood_2',
                        '_QuarterSold', '_BsmtFinSF1', '_BedroomAbvGr', '_OpenPorchSF', '_Foundation_1']
+backward_xgboost = ['_BldgType_2', '_GrLivArea', '_OverallQual', '_BuildingAge',
+                    '_TotalBsmtSF', '_Functional', '_CentralAir', '_LotArea', '_GarageArea',
+                    '_OverallCond', '_Neighborhood_9', '_BsmtExposure', '_FullBath',
+                    '_FireplaceQu', '_BsmtQual', '_SaleCondition_Normal', '_BsmtFinType1',
+                    '_MSZoning_1', '_HeatingQC', '_YrSold', '_YearRemodAdd',
+                    '_GarageFinish', '_LotFrontage', '_Exterior_Plywood', '_GarageQual',
+                    '_Neighborhood_8', '_BsmtCond', '_MSZoning_3', '_ExterCond',
+                    '_Neighborhood_2', '_BsmtFinSF1', '_BedroomAbvGr']
 # c
 # mlxtend 52 features forward  XGBRegressor(n_estimators=144,max_depth=6,eta=0.1,subsample=1,colsample_bytree=1)
 forward_xgboost_r2 = ['_BldgType_3', '_GrLivArea', '_OverallQual', '_BuildingAge',
@@ -330,6 +338,7 @@ if __name__ == "__main__":
                        forward_kneighbors,
                        backward_xgboost_r2,
                        forward_xgboost_r2,
+                       backward_xgboost,
                        forward_xgboost,
                        backward_svr_r2,
                        forward_svr_r2,
