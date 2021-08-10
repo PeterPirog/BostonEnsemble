@@ -1,7 +1,10 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split, KFold
 from models_ensemble.ensemble_tools import FeatureByNameSelector, Validator, read_config_files
+#http://rasbt.github.io/mlxtend/user_guide/feature_selection/SequentialFeatureSelector/
 from mlxtend.feature_selection import SequentialFeatureSelector as SFS
+from mlxtend.plotting import plot_sequential_feature_selection as plot_sfs
+import matplotlib.pyplot as plt
 
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import ElasticNet
@@ -42,10 +45,20 @@ if __name__ == "__main__":
     sfs = SFS(LGBMRegressor(boosting_type='gbdt',num_leaves=31, max_depth=- 1,learning_rate=0.1,n_estimators=100),
               k_features=65,
               forward=False,
-              floating=False,
+              floating=True,
               verbose=2,
               scoring='neg_root_mean_squared_error',#'r2'
-              cv=cv)
+              cv=cv,
+              n_jobs=-1)
 
     sfs = sfs.fit(X, y)
     print(X.columns[list(sfs.k_feature_idx_)])
+    df=pd.DataFrame.from_dict(sfs.get_metric_dict(confidence_interval=0.95)).T
+    df.to_csv('backward_features.csv')
+
+    fig1 = plot_sfs(sfs.get_metric_dict(), kind='std_err')
+
+    plt.ylim([0.8, 1])
+    plt.title('Sequential Forward Selection (w. StdDev)')
+    plt.grid()
+    plt.show()
