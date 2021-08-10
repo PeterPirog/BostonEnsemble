@@ -1,14 +1,44 @@
 import pandas as pd
+import tensorflow as tf
+from tensorflow.keras.wrappers.scikit_learn import KerasRegressor
+
 from sklearn.model_selection import train_test_split, KFold
 from models_ensemble.ensemble_tools import FeatureByNameSelector, Validator, read_config_files
 from mlxtend.feature_selection import SequentialFeatureSelector as SFS
-
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import ElasticNet
 from sklearn.neighbors import KNeighborsRegressor
 from xgboost import XGBRegressor
 from sklearn.svm import SVR
 from lightgbm import LGBMRegressor
+
+
+def baseline_model_seq(hidden1, hidden2, activation, noise_std, dropout):
+    model = tf.keras.models.Sequential()
+    model.add(tf.keras.layers.Flatten())
+    model.add(tf.keras.layers.LayerNormalization())
+    #Layer 1
+    model.add(tf.keras.layers.GaussianNoise(stddev=noise_std))
+    model.add(tf.keras.layers.Dense(units=hidden1, kernel_initializer='glorot_normal',
+                                    activation=activation))
+    model.add(tf.keras.layers.Dropout(dropout))
+    model.add(tf.keras.layers.LayerNormalization())
+    #Layer 2
+    model.add(tf.keras.layers.GaussianNoise(stddev=noise_std))
+    model.add(tf.keras.layers.Dense(units=hidden2, kernel_initializer='glorot_normal',
+                                    activation=activation))
+    model.add(tf.keras.layers.Dropout(dropout))
+    model.add(tf.keras.layers.LayerNormalization())
+    #Output Layer
+    model.add(tf.keras.layers.Dense(units=1, kernel_initializer='glorot_normal',
+                                    activation='linear'))
+    model.compile(
+        loss='mean_squared_error',  # mean_squared_logarithmic_error "mse"
+        optimizer=tf.keras.optimizers.Adam(learning_rate=0.1),
+        metrics='mean_squared_error')  # accuracy mean_squared_logarithmic_error
+    return model
+
+
 
 if __name__ == "__main__":
     conf_global = read_config_files(configuration_name='conf_global')
@@ -37,14 +67,37 @@ if __name__ == "__main__":
     X = df[all_features]
     y = df['SalePrice_log1']
 
-    # step backward feature selection algorithm
+    callbacks_list = [
+        tf.keras.callbacks.ReduceLROnPlateau(monitor='loss',
+                                             factor=0.1,
+                                             patience=10),
+        tf.keras.callbacks.EarlyStopping(monitor='loss',
+                                         patience=15)]
+
+    # step forward feature selection algorithm
+
+    model_keras = KerasRegressor(build_fn=baseline_model_seq,
+                                 hidden1=136,
+                                 hidden2=27,
+                                 noise_std=0.05,
+                                 activation='elu',
+                                 dropout=0.25,
+                                 # lr=config['learning_rate'],
+                                 ## fit parameters
+                                 batch_size=64,
+                                 epochs=100000,
+                                 verbose=0,
+                                 callbacks=callbacks_list
+                                 )
+
     cv = KFold(n_splits=5, shuffle=True, random_state=42)
-    sfs = SFS(LGBMRegressor(boosting_type='gbdt',num_leaves=31, max_depth=- 1,learning_rate=0.1,n_estimators=100),
-              k_features=65,
-              forward=False,
+
+    sfs = SFS(model_keras,
+              k_features=80,
+              forward=True,
               floating=False,
               verbose=2,
-              scoring='neg_root_mean_squared_error',#'r2'
+              scoring='neg_root_mean_squared_error',  # 'neg_root_mean_squared_error' 'r2'
               cv=cv)
 
     sfs = sfs.fit(X, y)

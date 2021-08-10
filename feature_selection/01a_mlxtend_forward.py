@@ -37,10 +37,12 @@ if __name__ == "__main__":
     X = df[all_features]
     y = df['SalePrice_log1']
 
+
+
     # step backward feature selection algorithm
 
     cv = KFold(n_splits=5, shuffle=True, random_state=42)
-    sfs = SFS(LGBMRegressor(boosting_type='gbdt',num_leaves=31, max_depth=- 1,learning_rate=0.1,n_estimators=100),
+    sfs = SFS(SVR(kernel='rbf', degree=3, gamma='scale', C=0.7832573311079015, epsilon=0.04825896120073174),
               k_features=80,
               forward=True,
               floating=False,
