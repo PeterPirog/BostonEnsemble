@@ -1,6 +1,6 @@
 import pandas as pd
 
-from sklearn.model_selection import train_test_split, KFold
+from sklearn.model_selection import train_test_split, KFold, RepeatedKFold
 from models_ensemble.ensemble_tools import FeatureByNameSelector, Validator, read_config_files
 #http://rasbt.github.io/mlxtend/user_guide/feature_selection/SequentialFeatureSelector/
 from mlxtend.feature_selection import SequentialFeatureSelector as SFS
@@ -13,6 +13,7 @@ from sklearn.neighbors import KNeighborsRegressor
 from xgboost import XGBRegressor
 from sklearn.svm import SVR
 from lightgbm import LGBMRegressor
+from pyearth import Earth
 
 if __name__ == "__main__":
     conf_global = read_config_files(configuration_name='conf_global')
@@ -45,8 +46,9 @@ if __name__ == "__main__":
 
     # step backward feature selection algorithm
 
-    cv = KFold(n_splits=5, shuffle=True, random_state=42)
-    sfs = SFS(SVR(kernel='rbf', degree=3, gamma='scale', C=0.7832573311079015, epsilon=0.04825896120073174),
+    #cv = KFold(n_splits=5, shuffle=True, random_state=42)
+    cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=42)
+    sfs = SFS(Earth(),
               k_features=80,
               forward=True,
               floating=True,
@@ -59,7 +61,8 @@ if __name__ == "__main__":
     print(X.columns[list(sfs.k_feature_idx_)])
 
     df=pd.DataFrame.from_dict(sfs.get_metric_dict(confidence_interval=0.95)).T
-    df.to_csv('forward_features.csv')
+    df.to_csv('forward_features_mars.csv')
+    df.to_excel('forward_features_mars.xlsx')
 
     fig1 = plot_sfs(sfs.get_metric_dict(), kind='std_err')
 

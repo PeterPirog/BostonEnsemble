@@ -14,19 +14,19 @@ def baseline_model_seq(hidden1, hidden2, activation, noise_std, dropout):
     model = tf.keras.models.Sequential()
     model.add(tf.keras.layers.Flatten())
     model.add(tf.keras.layers.LayerNormalization())
-    # Layer 1
+    #Layer 1
     model.add(tf.keras.layers.GaussianNoise(stddev=noise_std))
     model.add(tf.keras.layers.Dense(units=hidden1, kernel_initializer='glorot_normal',
                                     activation=activation))
     model.add(tf.keras.layers.Dropout(dropout))
     model.add(tf.keras.layers.LayerNormalization())
-    # Layer 2
+    #Layer 2
     model.add(tf.keras.layers.GaussianNoise(stddev=noise_std))
     model.add(tf.keras.layers.Dense(units=hidden2, kernel_initializer='glorot_normal',
                                     activation=activation))
     model.add(tf.keras.layers.Dropout(dropout))
     model.add(tf.keras.layers.LayerNormalization())
-    # Output Layer
+    #Output Layer
     model.add(tf.keras.layers.Dense(units=1, kernel_initializer='glorot_normal',
                                     activation='linear'))
     model.compile(
@@ -34,6 +34,7 @@ def baseline_model_seq(hidden1, hidden2, activation, noise_std, dropout):
         optimizer=tf.keras.optimizers.Adam(learning_rate=0.1),
         metrics='mean_squared_error')  # accuracy mean_squared_logarithmic_error
     return model
+
 
 
 if __name__ == "__main__":
@@ -73,11 +74,11 @@ if __name__ == "__main__":
     # step forward feature selection algorithm
 
     model_keras = KerasRegressor(build_fn=baseline_model_seq,
-                                 hidden1=30,  # 136
-                                 hidden2=10,  # 27
+                                 hidden1=30, #136
+                                 hidden2=10, #27
                                  noise_std=0.05,
                                  activation='elu',
-                                 dropout=0.01,  # 0.25
+                                 dropout=0.2,# 0.25
                                  # lr=config['learning_rate'],
                                  ## fit parameters
                                  batch_size=64,
@@ -86,12 +87,12 @@ if __name__ == "__main__":
                                  callbacks=callbacks_list
                                  )
 
-    # cv = KFold(n_splits=5, shuffle=True, random_state=42)
-    cv = RepeatedKFold(n_splits=10, n_repeats=3, random_state=42)
+    #cv = KFold(n_splits=10, shuffle=True, random_state=42)
+    cv=RepeatedKFold(n_splits=5, n_repeats=5, random_state=42)
 
     sfs = SFS(model_keras,
-              k_features=80,
-              forward=True,
+              k_features=51,
+              forward=False,
               floating=False,
               verbose=2,
               scoring='neg_root_mean_squared_error',  # 'neg_root_mean_squared_error' 'r2'
@@ -100,8 +101,8 @@ if __name__ == "__main__":
 
     sfs = sfs.fit(X, y)
     print(X.columns[list(sfs.k_feature_idx_)])
-    df = pd.DataFrame.from_dict(sfs.get_metric_dict(confidence_interval=0.95)).T
-    df.to_csv('forward_keras_features.csv')
+    df=pd.DataFrame.from_dict(sfs.get_metric_dict(confidence_interval=0.95)).T
+    df.to_csv('backward_keras_features.csv')
 
     fig1 = plot_sfs(sfs.get_metric_dict(), kind='std_err')
 
@@ -110,12 +111,4 @@ if __name__ == "__main__":
     plt.grid()
     plt.show()
 
-    # 44 features:
-    best_features = ['_BldgType_2', '_BldgType_1', '_BldgType_3', '_GrLivArea', '_MSSubClass_3', '_OverallQual',
-                     '_BuildingAge', '_TotalBsmtSF', '_CentralAir', '_Electrical', '_SaleCondition_Abnorml', '_LotArea',
-                     '_GarageArea', '_KitchenQual', '_OverallCond', '_BsmtExposure', '_BsmtUnfSF', '_Foundation_2',
-                     '_HouseStyle_2', '_HouseStyle_3', '_FullBath', '_Neighborhood_1', '_FireplaceQu', '_PavedDrive',
-                     '_HeatingQC', '_HalfBath', '_HouseStyle_1', '_WoodDeckSF', '_MSSubClass_1', '_LotFrontage',
-                     '_HouseStyle_4', '_MasVnrType_BrkFace', '_MasVnrType_Stone', '_BsmtFullBath', '_Neighborhood_8',
-                     '_Fence', '_Exterior_MetalSd', '_MSZoning_3', '_Neighborhood_2', '_QuarterSold', '_BsmtFinSF1',
-                     '_BedroomAbvGr', '_Foundation_1', '_MSSubClass_2']
+    df.to_excel('backward_keras.xlsx')
