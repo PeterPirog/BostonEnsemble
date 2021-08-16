@@ -46,13 +46,7 @@ if __name__ == "__main__":
 
     # cv = KFold(n_splits=5, shuffle=True, random_state=42)
     cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=42)
-    sfs = SFS(RandomForestRegressor(n_estimators=121,
-                                    criterion='mse',
-                                    max_depth=15,  # 12
-                                    min_samples_split=2,
-                                    min_samples_leaf=1,
-                                    min_weight_fraction_leaf=0.0,
-                                    max_features='auto'),
+    sfs = SFS(ElasticNet(alpha=0.0007431419163482603, l1_ratio=0.97),
               k_features=80,
               forward=True,
               floating=True,
@@ -65,8 +59,8 @@ if __name__ == "__main__":
     print(X.columns[list(sfs.k_feature_idx_)])
 
     df = pd.DataFrame.from_dict(sfs.get_metric_dict(confidence_interval=0.95)).T
-    df.to_csv('forward_features_rforest.csv')
-    df.to_excel('forward_features_rforest.xlsx')
+    df.to_csv('forward_features_elastic.csv')
+    df.to_excel('forward_features_elastic.xlsx')
 
     fig1 = plot_sfs(sfs.get_metric_dict(), kind='std_err')
 

@@ -53,3 +53,7 @@ if __name__ == "__main__":
     v.run()
 
     print(pipe.predict(X[:5]))
+
+    #31 features forward
+    ['_BldgType_2', '_GrLivArea', '_OverallQual', '_BuildingAge', '_TotalBsmtSF', '_CentralAir', '_LotArea', '_GarageArea', '_KitchenQual', '_OverallCond', '_Neighborhood_9', '_BsmtExposure', '_Neighborhood_1', '_FireplaceQu', '_BsmtQual', '_BsmtFinType1', '_MSZoning_1', '_Neighborhood_5', '_YearRemodAdd', '_GarageFinish', '_Exterior_VinylSd', '_MSSubClass_1', '_Neighborhood_8', '_Exterior_MetalSd', '_BsmtCond', '_MSZoning_3', '_Neighborhood_2', '_BsmtFinSF1', '_BedroomAbvGr', '_Foundation_1', '_MSSubClass_2']
+
