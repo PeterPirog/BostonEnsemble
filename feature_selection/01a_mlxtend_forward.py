@@ -2,7 +2,7 @@ import pandas as pd
 
 from sklearn.model_selection import train_test_split, KFold, RepeatedKFold
 from models_ensemble.ensemble_tools import FeatureByNameSelector, Validator, read_config_files
-#http://rasbt.github.io/mlxtend/user_guide/feature_selection/SequentialFeatureSelector/
+# http://rasbt.github.io/mlxtend/user_guide/feature_selection/SequentialFeatureSelector/
 from mlxtend.feature_selection import SequentialFeatureSelector as SFS
 from mlxtend.plotting import plot_sequential_feature_selection as plot_sfs
 import matplotlib.pyplot as plt
@@ -42,27 +42,31 @@ if __name__ == "__main__":
     X = df[all_features]
     y = df['SalePrice_log1']
 
-
-
     # step backward feature selection algorithm
 
-    #cv = KFold(n_splits=5, shuffle=True, random_state=42)
+    # cv = KFold(n_splits=5, shuffle=True, random_state=42)
     cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=42)
-    sfs = SFS(Earth(),
+    sfs = SFS(RandomForestRegressor(n_estimators=121,
+                                    criterion='mse',
+                                    max_depth=15,  # 12
+                                    min_samples_split=2,
+                                    min_samples_leaf=1,
+                                    min_weight_fraction_leaf=0.0,
+                                    max_features='auto'),
               k_features=80,
               forward=True,
               floating=True,
               verbose=2,
-              scoring='neg_root_mean_squared_error',# 'neg_root_mean_squared_error' 'r2'
+              scoring='neg_root_mean_squared_error',  # 'neg_root_mean_squared_error' 'r2'
               cv=cv,
               n_jobs=-1)
 
     sfs = sfs.fit(X, y)
     print(X.columns[list(sfs.k_feature_idx_)])
 
-    df=pd.DataFrame.from_dict(sfs.get_metric_dict(confidence_interval=0.95)).T
-    df.to_csv('forward_features_mars.csv')
-    df.to_excel('forward_features_mars.xlsx')
+    df = pd.DataFrame.from_dict(sfs.get_metric_dict(confidence_interval=0.95)).T
+    df.to_csv('forward_features_rforest.csv')
+    df.to_excel('forward_features_rforest.xlsx')
 
     fig1 = plot_sfs(sfs.get_metric_dict(), kind='std_err')
 

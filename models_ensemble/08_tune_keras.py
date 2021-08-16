@@ -24,15 +24,10 @@ def train_boston(config):
                      '_HouseStyle_4', '_MasVnrType_BrkFace', '_MasVnrType_Stone', '_BsmtFullBath', '_Neighborhood_8',
                      '_Fence', '_Exterior_MetalSd', '_MSZoning_3', '_Neighborhood_2', '_QuarterSold', '_BsmtFinSF1',
                      '_BedroomAbvGr', '_Foundation_1', '_MSSubClass_2']
-    # n_features = len(features_all)
-    # n_features=3
-    y = df['SalePrice_log1']
 
-    # X = df[features_all[:config['n_features']]]
-    X = df[best_features]
+    y = df['SalePrice_log1'].to_numpy()
+    X = df[best_features].to_numpy()
 
-    X = X.to_numpy()
-    y = y.to_numpy()
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=True)
 
     epochs = 100000
@@ -44,12 +39,12 @@ def train_boston(config):
     # layer 1
     x = tf.keras.layers.Dense(units=config["hidden1"], kernel_initializer='glorot_normal',
                               activation=config["activation"])(x)
-    #x = tf.keras.layers.LayerNormalization()(x)
+    # x = tf.keras.layers.LayerNormalization()(x)
     x = tf.keras.layers.Dropout(config["dropout1"])(x)
     # layer 2
     x = tf.keras.layers.Dense(units=config["hidden2"], kernel_initializer='glorot_normal',
                               activation=config["activation"])(x)
-    #x = tf.keras.layers.LayerNormalization()(x)
+    # x = tf.keras.layers.LayerNormalization()(x)
     x = tf.keras.layers.Dropout(config["dropout2"])(x)
 
     outputs = tf.keras.layers.Dense(units=1)(x)
@@ -77,8 +72,8 @@ def train_boston(config):
         batch_size=config["batch"],
         epochs=epochs,
         verbose=0,
-        validation_data=(X_test, y_test),  # tf reduce mean ignore tabnanny
-        callbacks=callbacks_list)  # "mean_accuracy": "val_accuracy"
+        validation_data=(X_test, y_test),
+        callbacks=callbacks_list)
 
 
 if __name__ == "__main__":
@@ -106,7 +101,7 @@ if __name__ == "__main__":
         checkpoint_at_end=True,
         verbose=3,
         # Optimalization
-        metric="val_loss",  # mean_accuracy
+        metric="val_loss",
         mode="min",  # max
         stop={
             # "mean_accuracy": 0.99,
@@ -118,13 +113,13 @@ if __name__ == "__main__":
         local_dir='/home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/',
         # default value is ~/ray_results /root/ray_results/
         resources_per_trial={
-            "cpu": 1,
+            "cpu": 8,
             "gpu": 0
         },
         config={
             # training parameters
             "batch": tune.choice([128]),
-            "noise_std":tune.uniform(0.01, 0.4),
+            "noise_std": tune.uniform(0.01, 0.4),
             "learning_rate": tune.choice([0.1]),
             # Layer 1 params
             "hidden1": tune.randint(3, 250),
@@ -139,3 +134,4 @@ if __name__ == "__main__":
     )
     print("Best result:", analysis.best_result, "Best hyperparameters found were: ", analysis.best_config)
 # tensorboard --logdir /home/peterpirog/PycharmProjects/BostonEnsemble/ray_results/keras2 --bind_all --load_fast=false
+#val_loss=0.01517682895064354 and parameters={'batch': 128, 'noise_std': 0.14222151327614074, 'learning_rate': 0.1, 'hidden1': 15, 'activation': 'elu', 'dropout1': 0.05588087960855004, 'hidden2': 55, 'dropout2': 0.019032128080466205}
