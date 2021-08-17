@@ -13,7 +13,7 @@ import joblib
 from category_encoders import OneHotEncoder
 from feature_engine.selection import DropConstantFeatures, DropDuplicateFeatures, SmartCorrelatedSelection
 from Transformers import QuantileTransformer, RareLabelNanEncoder, IterativeImputer
-
+import sktools
 import pandas as pd
 
 pd.set_option('display.max_columns', None)
@@ -22,12 +22,12 @@ pd.set_option('display.max_columns', None)
 def make_preprocessing(config):
     base_path = config['base_path']
 
-    x_train_enc_path = (base_path / "./data_files/encoded_train_X_data.csv").resolve()
-    x_train_enc_path_xlsx = (base_path / "./data_files/encoded_train_X_data.xlsx").resolve()
+    x_train_enc_path = (base_path / "./data_files/encoded_train_X_data2.csv").resolve()
+    x_train_enc_path_xlsx = (base_path / "./data_files/encoded_train_X_data2.xlsx").resolve()
     y_train_path = (base_path / "./data_files/y_train.csv").resolve()
 
-    x_test_enc_path = (base_path / "./data_files/encoded_test_X_data.csv").resolve()
-    x_test_enc_path_xlsx = (base_path / "./data_files/encoded_test_X_data.xlsx").resolve()
+    x_test_enc_path = (base_path / "./data_files/encoded_test_X_data2.csv").resolve()
+    x_test_enc_path_xlsx = (base_path / "./data_files/encoded_test_X_data2.xlsx").resolve()
     y_train_path = (base_path / "./data_files/y_test.csv").resolve()
 
     # df_x_enc = pd.read_csv(x_train_enc_path)
@@ -69,6 +69,7 @@ def make_preprocessing(config):
                         handle_unknown='return_nan',
                         # reaction for unknown empty values options are 'error', 'return_nan', 'value', and 'indicator'
                         use_cat_names=False)
+    qe= sktools.encoders.QuantileEncoder(quantile=0.5, m=1,handle_missing='return_nan', handle_unknown='return_nan')
 
     # STEP 3 - numerical values quantile transformation with skewness removing
     q_trans = QuantileTransformer(n_quantiles=1000, output_distribution='uniform',  # normal or uniform
@@ -99,7 +100,7 @@ def make_preprocessing(config):
     # STEP 5 MAKE PIPELINE AND TRAIN IT
     pipeline = Pipeline([
         ('rare_lab', rle),
-        ('one_hot', ohe),
+        ('one_hot',ohe ), #ohe
         ('q_trans', q_trans),
         ('drop_quasi_const', dcf),
         ('drop_duplicate', ddf),
