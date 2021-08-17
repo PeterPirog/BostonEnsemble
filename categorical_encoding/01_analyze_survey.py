@@ -6,15 +6,15 @@ pd.set_option('display.max_columns', None)
 
 
 import pandas as pd
-from sklearn.tree import DecisionTreeRegressor, plot_tree
+from sklearn.tree import plot_tree
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import mean_absolute_error,mean_squared_error
+from sklearn.metrics import mean_absolute_error
 from matplotlib import pyplot as plt
 
-from catboost import CatBoostRegressor
 from category_encoders.m_estimate import MEstimateEncoder
 from category_encoders.one_hot import OneHotEncoder
 import sktools
+from xgboost import XGBRegressor
 
 
 
@@ -51,38 +51,42 @@ if __name__ == "__main__":
     X_tr_te = te.fit_transform(X_tr, y_tr)
     X_tr_pe = pe.fit_transform(X_tr, y_tr)
 
-    dt = DecisionTreeRegressor(random_state=0, max_depth=6, ccp_alpha=0.1)
+    model = XGBRegressor(n_estimators=50,
+                             max_depth=6,
+                             eta=0.1,
+                             subsample=1,
+                             colsample_bytree=1,n_jobs=-1)
 
     #ONE HOT
-    dt.fit(X_tr_ohe, y_tr)
+    model.fit(X_tr_ohe, y_tr)
 
-    print(mean_absolute_error(dt.predict(X_tr_ohe), y_tr))
-    print(mean_absolute_error(dt.predict(ohe.transform(X_te)), y_te))
+    print(mean_absolute_error(model.predict(X_tr_ohe), y_tr))
+    print(mean_absolute_error(model.predict(ohe.transform(X_te)), y_te))
 
     plt.figure()
-    plot_tree(dt, filled=True)
+    plot_tree(model, filled=True)
     plt.savefig('tree_ohe.eps', format='eps')
     plt.show()
 
     #Target Encodings
-    dt.fit(X_tr_te, y_tr)
+    model.fit(X_tr_te, y_tr)
 
-    print(mean_absolute_error(dt.predict(X_tr_te), y_tr))
-    print(mean_absolute_error(dt.predict(te.transform(X_te)), y_te))
+    print(mean_absolute_error(model.predict(X_tr_te), y_tr))
+    print(mean_absolute_error(model.predict(te.transform(X_te)), y_te))
 
     plt.figure()
-    plot_tree(dt, filled=True)
+    plot_tree(model, filled=True)
     plt.savefig('tree_te.eps', format='eps')
     plt.show()
 
     #QUANTILE
-    dt.fit(X_tr_pe, y_tr)
+    model.fit(X_tr_pe, y_tr)
 
-    print(mean_absolute_error(dt.predict(X_tr_pe), y_tr))
-    print(mean_absolute_error(dt.predict(pe.transform(X_te)), y_te))
+    print(mean_absolute_error(model.predict(X_tr_pe), y_tr))
+    print(mean_absolute_error(model.predict(pe.transform(X_te)), y_te))
 
     plt.figure()
-    plot_tree(dt, filled=True)
+    plot_tree(model, filled=True)
     plt.show()
 
 
