@@ -6,7 +6,8 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class CategoriclalQuantileEncoder(BaseEstimator, TransformerMixin):
-    def __init__(self, features=None, p=0.5, m=1, remove_original=True, return_df=True,handle_missing_or_unknown='value'):
+    def __init__(self, features=None, p=0.5, m=1, remove_original=True, return_df=True,
+                 handle_missing_or_unknown='value'):
         super().__init__()
         self.features = features  # selected categorical features
         self.columns = None  # all columns in df
@@ -17,7 +18,7 @@ class CategoriclalQuantileEncoder(BaseEstimator, TransformerMixin):
         self.return_df = return_df
         self.handle_missing_or_unknown = handle_missing_or_unknown  # 'value' or ‘return_nan’
 
-        self.features_unique = {}  # dict with unique values for specified feature key form (p)
+        self.features_unique = {}  # dict with unique values lists for specified feature, key form (feature)
         self.global_quantiles = {}  # stored quantiles for whole dataset, key form (p)
         self.value_quantiles = {}  # stored quantiles for all values, key form (feature, value, p)
         self.value_counts = {}  # stored counts of every value in train data key form (feature, value)
@@ -54,19 +55,12 @@ class CategoriclalQuantileEncoder(BaseEstimator, TransformerMixin):
                 # Find y values for specified feature and specified value
                 idx = Xy[feature] == value
                 y_group = y[idx]
-
-                self.value_counts[feature, value] = len(y_group)  # counts for every feature and every value
-                print(f'n={self.value_counts[feature, value]} for feature={feature}, value={value}')
+                # counts for every feature and every value
+                self.value_counts[feature, value] = len(y_group)
+                # print(f'n={self.value_counts[feature, value]} for feature={feature}, value={value}')
 
                 for p in self.p:
                     self.value_quantiles[feature, value, p] = np.quantile(y_group, p)
-        print(f'global_quantiles={self.global_quantiles}')
-        print(f'value_quantiles={self.value_quantiles}')
-        print(f'value_counts={self.value_counts}')
-        print(f'features_unique={self.features_unique}')
-
-        # print(self.columns)
-        # print(self.features)
         return self
 
     def transform(self, X):
@@ -78,13 +72,11 @@ class CategoriclalQuantileEncoder(BaseEstimator, TransformerMixin):
             X[feature] = X[feature].apply(lambda value: value if value in self.features_unique[feature] else 'UNKNOWN')
             for p in self.p:
                 for m in self.m:
+                    # Prepare new columns names
                     feature_name = feature + '_' + str(p) + '_' + str(m)
 
-                    X[feature_name] = X[feature].apply(
-                        lambda value: self.global_quantiles[p] if value == "MISSING" or value == 'UNKNOWN' else
-                        self.value_counts[feature, value])
-
-                    if self.handle_missing_or_unknown == 'value':  # return in output df global quantile values if input value is nan
+                    # return global quantile values if input value is nan or unknown
+                    if self.handle_missing_or_unknown == 'value':
                         X[feature_name] = self.global_quantiles[p]
                         X[feature_name] = X[feature].apply(lambda value: self.global_quantiles[p]
                         if value == "MISSING" or value == 'UNKNOWN'
@@ -92,7 +84,8 @@ class CategoriclalQuantileEncoder(BaseEstimator, TransformerMixin):
                         else (self.value_counts[feature, value] * self.value_quantiles[feature, value, p] +
                               m * self.global_quantiles[p]) / (self.value_counts[feature, value] + m))
 
-                    if self.handle_missing_or_unknown == 'return_nan':  # return in output df np.nan if input value is nan
+                    # return nan if input value is nan or unknown
+                    if self.handle_missing_or_unknown == 'return_nan':
                         X[feature_name] = self.global_quantiles[p]
                         X[feature_name] = X[feature].apply(lambda value: np.nan
                         if value == "MISSING" or value == 'UNKNOWN'
@@ -121,13 +114,11 @@ if __name__ == '__main__':
     y = np.log1p(df_train['SalePrice']).copy()
 
     X['MSSubClass'] = 'm' + X['MSSubClass'].apply(str)
-    # print(df_train.head(5))
-    # print(y)
 
     cqe = CategoriclalQuantileEncoder(features=None, p=[0.1, 0.5, 0.9], m=[0, 50],
-                                      remove_original=False,
+                                      remove_original=True,
                                       return_df=True,
-                                      handle_missing_or_unknown='return_nan')  # 'return_nan' or 'value'
+                                      handle_missing_or_unknown='value')  # 'return_nan' or 'value'
 
     X_enc = cqe.fit_transform(X=X, y=y)
     print(X_enc.head())
