@@ -2,38 +2,31 @@ import numpy as np
 import pandas as pd
 
 pd.set_option('display.max_columns', None)
-from pathlib import Path
 from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class CategoriclalQuantileEncoder(BaseEstimator, TransformerMixin):
-    def __init__(self, features=None, p=0.5, m=1, remove_original=True, return_df=True, handle_missing='value',
-                 handle_unknown='value'):
+    def __init__(self, features=None, p=0.5, m=1, remove_original=True, return_df=True,handle_missing_or_unknown='value'):
         super().__init__()
         self.features = features  # selected categorical features
         self.columns = None  # all columns in df
         self.column_target = None
         self.p = p
         self.m = m
+        self.remove_original = remove_original
         self.return_df = return_df
-        self.handle_missing = handle_missing  # 'value' or ‘return_nan’
-        self.handle_unknown = handle_unknown  # 'value' or ‘return_nan’
+        self.handle_missing_or_unknown = handle_missing_or_unknown  # 'value' or ‘return_nan’
 
-        self.features_unique = {}  # dict with unique values for speciffied feature
-        # self.qp = []  # quantiles for all dataset
+        self.features_unique = {}  # dict with unique values for specified feature key form (p)
         self.global_quantiles = {}  # stored quantiles for whole dataset, key form (p)
         self.value_quantiles = {}  # stored quantiles for all values, key form (feature, value, p)
         self.value_counts = {}  # stored counts of every value in train data key form (feature, value)
 
-        # convert p and m to lists for iteration
+        # convert p and m to lists for iteration available
         if isinstance(p, int) or isinstance(p, float):
             self.p = [self.p]
         if isinstance(m, int) or isinstance(m, float):
             self.m = [self.m]
-
-        # print(self.m)
-
-        self.remove_original = remove_original
 
     def fit(self, X, y=None):
         y = y.to_frame().copy()
@@ -53,11 +46,9 @@ class CategoriclalQuantileEncoder(BaseEstimator, TransformerMixin):
 
         # Find quantiles for all dataset for each value of p
         for p in self.p:
-            # self.qp.append(np.quantile(y, p))
             self.global_quantiles[p] = np.quantile(y, p)
 
-        # print(f'global quantiles={self.global_quantiles}')
-        # Find quantiles for evry faeature and every value
+        # Find quantiles for every feature and every value
         for feature in self.features:
             for value in list(X[feature].unique()):  # for every unique value
                 # Find y values for specified feature and specified value
@@ -72,6 +63,7 @@ class CategoriclalQuantileEncoder(BaseEstimator, TransformerMixin):
         print(f'global_quantiles={self.global_quantiles}')
         print(f'value_quantiles={self.value_quantiles}')
         print(f'value_counts={self.value_counts}')
+        print(f'features_unique={self.features_unique}')
 
         # print(self.columns)
         # print(self.features)
@@ -82,27 +74,31 @@ class CategoriclalQuantileEncoder(BaseEstimator, TransformerMixin):
 
         # Create new columns for quantile values
         for feature in self.features:
+            X[feature] = X[feature].replace(np.nan, 'MISSING')
+            X[feature] = X[feature].apply(lambda value: value if value in self.features_unique[feature] else 'UNKNOWN')
             for p in self.p:
                 for m in self.m:
                     feature_name = feature + '_' + str(p) + '_' + str(m)
-                    # Quantile Encoder: Tackling High Cardinality Categorical Features in Regression Problems, equation 2
 
-                    if self.handle_missing == 'value':  # return in output df global quantile values if input value is nan
-                        X[feature_name]=self.global_quantiles[p]
-                        X[feature_name] = X[feature].apply(lambda value: (self.value_counts[feature, value] *
-                                                                          self.value_quantiles[feature, value, p] + m *
-                                                                          self.global_quantiles[p])
-                                                                         / (self.value_counts[
-                                                                                feature, value] + m) if not pd.isnull(
-                            value) else self.global_quantiles[p])
+                    X[feature_name] = X[feature].apply(
+                        lambda value: self.global_quantiles[p] if value == "MISSING" or value == 'UNKNOWN' else
+                        self.value_counts[feature, value])
 
-                    if self.handle_missing == 'return_nan':  # return in output df np.nan if input value is nan
-                        X[feature_name] = X[feature].apply(lambda value: (self.value_counts[feature, value] *
-                                                                          self.value_quantiles[feature, value, p] + m *
-                                                                          self.global_quantiles[p])
-                                                                         / (self.value_counts[
-                                                                                feature, value] + m) if not pd.isnull(
-                            value) else np.nan)
+                    if self.handle_missing_or_unknown == 'value':  # return in output df global quantile values if input value is nan
+                        X[feature_name] = self.global_quantiles[p]
+                        X[feature_name] = X[feature].apply(lambda value: self.global_quantiles[p]
+                        if value == "MISSING" or value == 'UNKNOWN'
+                        # Quantile Encoder: Tackling High Cardinality Categorical Features in Regression Problems, equation 2
+                        else (self.value_counts[feature, value] * self.value_quantiles[feature, value, p] +
+                              m * self.global_quantiles[p]) / (self.value_counts[feature, value] + m))
+
+                    if self.handle_missing_or_unknown == 'return_nan':  # return in output df np.nan if input value is nan
+                        X[feature_name] = self.global_quantiles[p]
+                        X[feature_name] = X[feature].apply(lambda value: np.nan
+                        if value == "MISSING" or value == 'UNKNOWN'
+                        # Quantile Encoder: Tackling High Cardinality Categorical Features in Regression Problems, equation 2
+                        else (self.value_counts[feature, value] * self.value_quantiles[feature, value, p] +
+                              m * self.global_quantiles[p]) / (self.value_counts[feature, value] + m))
 
         # Remove original features
         if self.remove_original:
@@ -129,15 +125,15 @@ if __name__ == '__main__':
     # print(y)
 
     cqe = CategoriclalQuantileEncoder(features=None, p=[0.1, 0.5, 0.9], m=[0, 50],
-                                      remove_original=True,
+                                      remove_original=False,
                                       return_df=True,
-                                      handle_missing='value',
-                                      handle_unknown='value')
+                                      handle_missing_or_unknown='return_nan')  # 'return_nan' or 'value'
 
     X_enc = cqe.fit_transform(X=X, y=y)
     print(X_enc.head())
-    X_test=df_test[features].copy()
+    X_test = df_test[features].copy()
     X_test['MSSubClass'] = 'm' + X_test['MSSubClass'].apply(str)
 
-    print(X_test.head())
-    #out=cqe.transform(X=X_test)
+    # print(X_test.head())
+    out = cqe.transform(X=X_test)
+    print(f'out={out.head()}')
