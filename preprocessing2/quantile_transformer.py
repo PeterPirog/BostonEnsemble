@@ -6,10 +6,11 @@ from sklearn.base import BaseEstimator, TransformerMixin
 
 
 class CategoriclalQuantileEncoder(BaseEstimator, TransformerMixin):
-    def __init__(self, features=None, p=0.5, m=1, remove_original=True, return_df=True,
+    def __init__(self, features=None, ignored_features=None, p=0.5, m=1, remove_original=True, return_df=True,
                  handle_missing_or_unknown='value'):
         super().__init__()
         self.features = features  # selected categorical features
+        self.ignored_features = ignored_features
         self.columns = None  # all columns in df
         self.column_target = None
         self.p = p
@@ -29,6 +30,13 @@ class CategoriclalQuantileEncoder(BaseEstimator, TransformerMixin):
         if isinstance(m, int) or isinstance(m, float):
             self.m = [self.m]
 
+        # convert feature lists for iteration available
+        if not isinstance(self.features, list) and self.features is not None:
+            self.features = [self.features]
+
+        if not isinstance(self.ignored_features, list) and self.ignored_features is not None:
+            self.ignored_features = [self.ignored_features]
+
     def fit(self, X, y=None):
         y = y.to_frame().copy()
         Xy = pd.concat([X, y], axis=1)
@@ -40,6 +48,10 @@ class CategoriclalQuantileEncoder(BaseEstimator, TransformerMixin):
         else:
             if isinstance(self.features, str):  # convert single feature name to list for iteration possibility
                 self.features = [self.features]
+        # Remove ignored features
+        if self.ignored_features is not None:
+            for ignored_feature in self.ignored_features:
+                self.features.remove(ignored_feature)
 
         # Find unique values for specified features
         for feature in self.features:
@@ -115,7 +127,9 @@ if __name__ == '__main__':
 
     X['MSSubClass'] = 'm' + X['MSSubClass'].apply(str)
 
-    cqe = CategoriclalQuantileEncoder(features=None, p=[0.1, 0.5, 0.9], m=[0, 50],
+    cqe = CategoriclalQuantileEncoder(features=None,
+                                      ignored_features=['MSSubClass'],
+                                      p=[0.1, 0.5, 0.9], m=[0, 50],
                                       remove_original=True,
                                       return_df=True,
                                       handle_missing_or_unknown='value')  # 'return_nan' or 'value'
