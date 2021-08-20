@@ -11,6 +11,7 @@ from sklearn.pipeline import Pipeline
 from transformer_tools import CategoriclalQuantileEncoder, \
     DomainKnowledgeTransformer, \
     QuantileTransformer, IterativeImputer
+from pyearth import Earth
 
 if __name__ == '__main__':
     verbose = False
@@ -32,7 +33,7 @@ if __name__ == '__main__':
     dkt = DomainKnowledgeTransformer()
     cqe = CategoriclalQuantileEncoder(features=None,
                                       ignored_features=None,
-                                      p=[0.1, 0.5, 0.9], m=[10],
+                                      p=[0.1, 0.5, 0.9], m=[1,10],
                                       remove_original=True,
                                       return_df=True,
                                       handle_missing_or_unknown='value')
@@ -49,7 +50,7 @@ if __name__ == '__main__':
                                    estimator=None,
                                    )
 
-    q_trans = QuantileTransformer(n_quantiles=1000, output_distribution='uniform',  # normal or uniform
+    q_trans = QuantileTransformer(n_quantiles=1000, output_distribution='normal',  # normal or uniform
                                   ignore_implicit_zeros=False,
                                   subsample=1e5, random_state=42, copy=True)
 
@@ -57,7 +58,7 @@ if __name__ == '__main__':
                            max_value=np.inf,
                            random_state=42,
                            initial_strategy='median',
-                           max_iter=30,
+                           max_iter=10,
                            tol=0.001,
                            verbose=3)
 
@@ -72,7 +73,7 @@ if __name__ == '__main__':
                      ('categorical_encoder', cqe),
                      ('drop_quasi_constant', dcf),
                      ('quantile_scaling',q_trans),
-                     ('smart_correlation',scs),
+                     #('smart_correlation',scs),
                      ('imputer',imp)])
 
     X_encoded = pipe.fit_transform(X=X, y=y)
@@ -81,12 +82,13 @@ if __name__ == '__main__':
     #print(y_out.head(10))
     print(X_encoded.info())
     # print(y_out .describe())
-
+    n_features=len(X_encoded.columns)
+    print(f'n_features={n_features}')
 
 
     cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=42)
     sfs = SFS(ElasticNet(alpha=0.0007431419163482603, l1_ratio=0.97),
-              k_features=80,
+              k_features=150,
               forward=True,
               floating=True,
               verbose=2,
@@ -95,8 +97,8 @@ if __name__ == '__main__':
               n_jobs=-1)
 
     sfs = sfs.fit(X=X_encoded, y=y)
-    print(X.columns[list(sfs.k_feature_idx_)])
+    #print(X.columns[list(sfs.k_feature_idx_)])
 
     df = pd.DataFrame.from_dict(sfs.get_metric_dict(confidence_interval=0.95)).T
-    df.to_csv('forward_features_elastic.csv')
-    df.to_excel('forward_features_elastic.xlsx')
+    df.to_csv('forward_features_elastic_full.csv')
+    df.to_excel('forward_features_elastic_full.xlsx')
