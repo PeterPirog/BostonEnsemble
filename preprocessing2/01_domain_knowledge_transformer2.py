@@ -1,3 +1,4 @@
+#%%
 from pathlib import Path
 
 import numpy as np
@@ -12,18 +13,21 @@ from transformer_tools import CategoriclalQuantileEncoder, \
     DomainKnowledgeTransformer, \
     QuantileTransformer, IterativeImputer
 from pyearth import Earth
+from sklearn.neighbors import KNeighborsRegressor
 
 if __name__ == '__main__':
     verbose = False
 
     # define path to the project directory
-    base_path = Path(__file__).parent.parent
+    project_path = Path(__file__).parent.parent
 
     # make all dataframe columns visible
     pd.set_option('display.max_columns', None)
 
-    df_train = pd.read_csv('/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/train.csv')
-    df_test = pd.read_csv('/home/peterpirog/PycharmProjects/BostonEnsemble/data_files/test.csv')
+    #%%
+    df_train = pd.read_csv(project_path.joinpath('data_files/train.csv'))
+    # %%
+    df_test = pd.read_csv(project_path.joinpath('data_files/test.csv'))
 
     X = df_train.drop(['SalePrice'], axis='columns').copy()
     y = np.log1p(df_train['SalePrice']).copy()
@@ -33,7 +37,7 @@ if __name__ == '__main__':
     dkt = DomainKnowledgeTransformer()
     cqe = CategoriclalQuantileEncoder(features=None,
                                       ignored_features=None,
-                                      p=[0.1, 0.5, 0.9], m=[1,10],
+                                      p=[0.1, 0.5, 0.9], m=[1,10,50],
                                       remove_original=True,
                                       return_df=True,
                                       handle_missing_or_unknown='value')
@@ -87,8 +91,8 @@ if __name__ == '__main__':
 
 
     cv = RepeatedKFold(n_splits=10, n_repeats=5, random_state=42)
-    sfs = SFS(ElasticNet(alpha=0.0007431419163482603, l1_ratio=0.97),
-              k_features=150,
+    sfs = SFS(Earth(),
+              k_features=100,
               forward=True,
               floating=True,
               verbose=2,
@@ -100,5 +104,11 @@ if __name__ == '__main__':
     #print(X.columns[list(sfs.k_feature_idx_)])
 
     df = pd.DataFrame.from_dict(sfs.get_metric_dict(confidence_interval=0.95)).T
-    df.to_csv('forward_features_elastic_full.csv')
-    df.to_excel('forward_features_elastic_full.xlsx')
+    df.to_csv('forward_features_Earth_100.csv')
+    df.to_excel('forward_features_Earth_100.xlsx')
+"""
+Elastic Net 50 features -0,121143288
+['LotArea', 'OverallQual', 'OverallCond', 'YearBuilt', 'YearRemodAdd', 'BsmtQual', 'BsmtExposure', 'BsmtFinSF1', 'BsmtFinType2', 'BsmtUnfSF', 'TotalBsmtSF', 'HeatingQC', 'CentralAir', 'GrLivArea', 'BsmtFullBath', 'FullBath', 'HalfBath', 'KitchenQual', 'Functional', 'FireplaceQu', 'GarageCars', 'WoodDeckSF', 'OpenPorchSF', 'EnclosedPorch', 'ScreenPorch', 'MSZoning_0.5_10', 'MSZoning_0.9_1', 'MSZoning_0.9_10', 'LandContour_0.5_1', 'LotConfig_0.9_1', 'Neighborhood_0.1_10', 'Neighborhood_0.5_1', 'Neighborhood_0.9_1', 'Neighborhood_0.9_10', 'Condition1_0.5_1', 'Condition1_0.5_10', 'Condition1_0.9_1', 'BldgType_0.9_10', 'HouseStyle_0.9_10', 'RoofStyle_0.5_10', 'RoofMatl_0.9_1', 'Exterior1st_0.5_1', 'Foundation_0.1_10', 'Foundation_0.5_10', 'GarageType_0.1_10', 'MiscFeature_0.5_1', 'MoSold_0.9_1', 'SaleCondition_0.1_10', 'SaleCondition_0.5_1', 'SaleCondition_0.5_10']
+
+
+"""
